@@ -62,12 +62,7 @@ html::-webkit-scrollbar{
     background-color: #181E23;
 }
 
-.reviewarea::-webkit-scrollbar {
-    width: 10px;
-    background-color: #0B0D10;
-}
-
-html::-webkit-scrollbar-thumb, #leftblock::-webkit-scrollbar-thumb, .reviewarea::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb, #leftblock::-webkit-scrollbar-thumb {
    background: linear-gradient(315deg,#ff0057,#e64a19);
    border-radius: 10px;
 }
@@ -109,7 +104,7 @@ ul {
 }
 
 
-.login { /* КНОПКИ "РЕГИСТРАЦИЯ" И "ВХОД" */
+.login, .auth { /* КНОПКИ "РЕГИСТРАЦИЯ" И "ВХОД" */
 	width: 140px;
 	font-family: "Roboto Condensed",sans-serif;
 	font-size: 20px;
@@ -137,6 +132,17 @@ a#top {
    	-webkit-animation-iteration-count: 1;
    	animation-iteration-count: 1;
 }
+
+.auth:hover {
+	background: linear-gradient(315deg,#e91e63,#5d02ff);
+	border-radius: 5px;
+	-webkit-animation: swing 0.6s ease;
+  	animation: swing 0.6s ease;
+   	-webkit-animation-iteration-count: 1;
+   	animation-iteration-count: 1;
+}
+
+
 
 .descriptionhead { /*ОПИСАНИЕ САЙТА*/
 	width: 800px;
@@ -171,7 +177,7 @@ a#top {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background: url(../img/clock.png);
+	background: url(../../img/clock.png);
 	background-size: cover;
 	border: 4px solid #181E23;
 	box-shadow: 0 -15px 15px rgba(255,255,255,0.05),
@@ -574,12 +580,11 @@ svg circle:nth-child(2) {
 	padding: 20px;
 	position: absolute;
 	top: 5%;
-	left: 43%;
+	left: 40%;
 	font-family: "Roboto Condensed",sans-serif;
 }
 
 .regform h1 {
-	text-align: center;
 	color: white;
 	font-family: "Roboto Condensed",sans-serif;
 	font-weight: 600;
@@ -600,6 +605,15 @@ svg circle:nth-child(2) {
 	color: white;
 	font-family: "Roboto Condensed",sans-serif;
 	font-size: 18px;
+}
+
+.errormsg {
+	text-align: center;
+	position: relative;
+	margin-top: -60px;
+	margin-left: -100px;
+	color: #EE0C44;
+	font-size: 30px;
 }
 
 @import "https://fonts.googleapis.com/css?family=Varela+Round";
@@ -677,7 +691,6 @@ input:focus:not([type="submit"]) {
 	border-bottom: 3px solid #650AF2;
 	outline-offset: 0;
 	box-shadow: none;
-	background-color: #1F2326;
 }
 
 input:focus[type="submit"] {
@@ -714,15 +727,6 @@ input:-webkit-autofill {
    	cursor: pointer;
 }
 
-.errormsg {
-	text-align: center;
-	position: relative;
-	margin-top: -70px;
-	margin-left: -90px;
-	color: #EE0C44;
-	font-size: 30px;
-}
-
 a#source {
 	width: 100px;
 	padding: 5px;
@@ -739,45 +743,3 @@ a#source {
 a#source:hover {
 	color: #650AF2;
 }
-
-/*СТРАНИЦА ОТЗЫВА*/
-.review {
-	margin: 0;
-	position: relative;
-	text-align: center;
-}
-
-.reviewarea {
-	margin: auto;
-	border: none;
-	background-color: #0B0D10;
-	font-size: 24px;
-	color: white;
-	text-shadow: 1px 1px 1px rgba(0,0,0,.5);
-	width: 90%;
-	height: 360px;
-	resize: none;
-}
-
-.reviewsubmit {
-	width: 120px;
-	font-family: "Roboto Condensed",sans-serif;
-	font-size: 18px;
-	padding: 5px;
-	text-align: center;
-	background: linear-gradient(315deg,#ff0057,#e64a19);
-	border-radius: 5px;
-	margin: 40px 0;
-	color: white;
-	border: none;
-}
-
-.reviewsubmit:hover {
-	background: linear-gradient(315deg,#e91e63,#5d02ff);
-	-webkit-animation: swing 0.6s ease;
-  	animation: swing 0.6s ease;
-   	-webkit-animation-iteration-count: 1;
-   	animation-iteration-count: 1;
-   	cursor: pointer;
-}
-

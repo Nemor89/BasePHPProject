@@ -1,5 +1,8 @@
 <?php
 require_once 'functions/functions.php';
+if (!empty ($_POST['submitlogin'])) {
+  $errorMsg = authorization();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -20,11 +23,16 @@ require_once 'functions/functions.php';
         require_once "inc/leftmenu.php";
       ?>
       <div class="content">
+        <div class="errormsg">
+          <?php
+          echo $errorMsg;
+          ?>
+        </div>
         <form class="regform" method="post" enctype="multipart/form-data">
           <h1>Авторизация</h1>
           <input class="reg" type="text" name="login" placeholder="Логин">
           <input class="reg" type="password" name="password" placeholder="Пароль">
-          <input class="regbtn" type="submit" name="submit" value="Войти">
+          <input class="regbtn" type="submit" name="submitlogin" value="Войти">
         </form>
       </div>
      </div>
