@@ -145,13 +145,23 @@ a#top {
 }
 
 .descriptionhead { /*ОПИСАНИЕ САЙТА*/
-	width: 800px;
+	width: 700px;
+	max-width: 800px;
 	margin-top: 12px;
 	text-align: center;
 	font-family: "Roboto",sans-serif;
 	line-height: 1.5;
 	color: #C1C1C1;
 	text-shadow: 1px 1px 1px rgba(0,0,0,.5);
+}
+
+.avatar {
+	max-width: 200px;
+	max-height: 120px;
+}
+
+figure {
+	text-align: center;
 }
 
 /*MAIN CONTENT*/

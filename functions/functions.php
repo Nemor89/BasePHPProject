@@ -1,5 +1,17 @@
 <?php
 session_start();
+
+// SQL
+
+function my_connect() {
+	$SQLhost = 'localhost';
+	$SQLuser = 'root';
+	$SQLpassword = '';
+	$SQLdatebase = 'basephp_project';
+
+	return mysqli_connect($SQLhost, $SQLuser, $SQLpassword, $SQLdatebase);
+}
+
 // HEADER
 
 function visitor_name() {
@@ -28,6 +40,24 @@ function my_daytime() {
 	$day = iconv('windows-1251', 'utf-8', $day);
 
 	return "Сегодня $day, " . date('d.m.Y') . " года";
+}
+
+function avatar_view() {
+	if ($_SESSION['auth']) {
+		$username = $_SESSION["username"];
+		$link = my_connect() or die (mysqli_error($link));
+		$query = "SELECT * FROM users WHERE username='$username'";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		$user = mysqli_fetch_assoc($result) or die (mysqli_error($link));
+
+		if (isset($user["avatar"])) {
+			$result = '<figure>';
+			$result .= '<img class="avatar" src="' . $user["avatar"] . '">';
+			$result .= '</figure>';
+		}
+
+		return $result;
+	}
 }
 
 //MENU
@@ -168,7 +198,7 @@ function admin_bottom_menu() {
 
 function registr() {
 	
-	$link = mysqli_connect('localhost', 'root', '', 'basephp_project') or die (mysqli_error($link));
+	$link = my_connect() or die (mysqli_error($link));
 
 	$login = trim($_POST['login']);
 	$email = trim($_POST['email']);
@@ -195,7 +225,7 @@ function registr() {
 	} elseif (!empty($_POST['email']) && !preg_match('#^([A-Za-z0-9_\.-])+?@([A-Za-z0-9_\.-])+?\.([A-Za-z\.]{2,6})$#', $_POST['email'])) {
 		$errorMsg = 'Некорректный email';
 		return $errorMsg;
-	} elseif (mysqli_num_rows($resultEmail) > 0) {
+	} elseif (!empty($_POST['email']) && mysqli_num_rows($resultEmail) > 0) {
 		$errorMsg = 'Такой email уже используется';
 		return $errorMsg;
 	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
@@ -217,13 +247,16 @@ function registr() {
 		move_uploaded_file($_FILES['attachment-file']['tmp_name'], $avatar);
 		$query = "UPDATE users SET avatar='$avatar' WHERE id='{$user['id']}'";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+	} else {
+		$avatar = 'img/avatars/stnd_ava.png';
+		$query = "UPDATE users SET avatar='$avatar' WHERE id='{$user['id']}'";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 	}
 
 	session_start();
 	$_SESSION['auth'] = true;
 	$_SESSION['username'] = $user ['username'];
 	$_SESSION['status'] = $user['status_id'];
-	$_SESSION['user_id'] = $user['id'];
 
 	header('Location: index.php');
 	}  
@@ -234,7 +267,7 @@ function registr() {
 function authorization() {
 	$login = $_POST['login'];
 
-	$link = mysqli_connect('localhost', 'root', '', 'basephp_project') or die (mysqli_error($link));
+	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM users WHERE username='$login'"; // получаем юзера по логину
 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
 	$user = mysqli_fetch_assoc($result);
@@ -275,13 +308,13 @@ function my_upload() {
 		$image = getimagesize($filePath);
 		$limitBytes  = 1024 * 1024 * 2;
 		$limitWidth  = 1280;
-		$limitHeight = 768;
+		$limitHeight = 1280;
 		if (filesize($filePath) > $limitBytes) {
 			$errorMsg = 'Размер изображения не должен превышать 2 Мбайт';
 			return $errorMsg;
 		}
 		if ($image[1] > $limitHeight) {
-			$errorMsg = 'Высота изображения не должна превышать 768 точек';
+			$errorMsg = 'Высота изображения не должна превышать 1280 точек';
 			return $errorMsg;
 		}
 		if ($image[0] > $limitWidth) {
