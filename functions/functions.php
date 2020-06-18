@@ -49,7 +49,7 @@ function header_menu() {
 	} else {
 		$headerMenu = [
 			'Настройки' => '#',
-			'Выйти' => '#'
+			'Выйти' => 'logout.php'
 		];
 
 		$result = '';
@@ -116,7 +116,7 @@ function admin_header_menu() {
 	} else {
 		$headerMenu = [
 			'Настройки' => '#',
-			'Выйти' => '#'
+			'Выйти' => '../logout.php'
 		];
 
 		$result = '';
@@ -167,6 +167,7 @@ function admin_bottom_menu() {
 //REGISTRATION
 
 function registr() {
+	
 	$link = mysqli_connect('localhost', 'root', '', 'basephp_project') or die (mysqli_error($link));
 
 	$login = trim($_POST['login']);
@@ -175,6 +176,9 @@ function registr() {
 
 	$query = "SELECT * FROM users WHERE username='$login'";
 	$resultlogin = mysqli_query($link, $query);
+
+	$query = "SELECT * FROM users WHERE useremail='$email'";
+	$resultEmail = mysqli_query($link, $query);
 
 	if (!preg_match('#([A-Za-z0-9-]+){5,15}#', $_POST['login'])) {
 		$errorMsg = 'Логин должен быть длиной от 5 до 15 символов и состоять из букв латинского алфавита, или цифр';
@@ -188,22 +192,38 @@ function registr() {
 	} elseif ($_POST['password'] != $_POST['confirm']) {
 		$errorMsg = 'Пароли не совпадают';
 		return $errorMsg;
-	} elseif (!preg_match('#^([A-Za-z0-9_\.-])+?@([A-Za-z0-9_\.-])+?\.([A-Za-z\.]{2,6})$#', $_POST['email'])) {
+	} elseif (!empty($_POST['email']) && !preg_match('#^([A-Za-z0-9_\.-])+?@([A-Za-z0-9_\.-])+?\.([A-Za-z\.]{2,6})$#', $_POST['email'])) {
 		$errorMsg = 'Некорректный email';
+		return $errorMsg;
+	} elseif (mysqli_num_rows($resultEmail) > 0) {
+		$errorMsg = 'Такой email уже используется';
+		return $errorMsg;
+	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
+		$errorMsg = my_upload();
 		return $errorMsg;
 	} else {
 	
 	$query = "INSERT INTO users (username, useremail, password) VALUES ('$login', '$email', '$password')";
 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
 
-	session_start();
 	$query = "SELECT * FROM users WHERE username='$login'";
 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
 	$user = mysqli_fetch_assoc($result) or die (mysqli_error($link));
 
+	if (!empty ($_FILES['attachment-file']['tmp_name'])) {
+		$pathInfo = pathinfo($_FILES['attachment-file']['name']);
+	    $exp = $pathInfo['extension'];
+	    $avatar = 'img/avatars/' . $user['id'] . '_ava.' . $exp;
+		move_uploaded_file($_FILES['attachment-file']['tmp_name'], $avatar);
+		$query = "UPDATE users SET avatar='$avatar' WHERE id='{$user['id']}'";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+	}
+
+	session_start();
 	$_SESSION['auth'] = true;
 	$_SESSION['username'] = $user ['username'];
 	$_SESSION['status'] = $user['status_id'];
+	$_SESSION['user_id'] = $user['id'];
 
 	header('Location: index.php');
 	}  
@@ -222,18 +242,54 @@ function authorization() {
 	if (!empty($user)) {
 		$hash = $user['password'];
 
-		if (password_verify($_POST['password'], $hash)) {
+		if (password_verify($_POST['password'], $hash) && ($user['banned'] == 0)) {
 			session_start();
 			$_SESSION['auth'] = true;
 			$_SESSION['username'] = $user ['username'];
 			$_SESSION['status'] = $user['status_id'];
 			header('Location: index.php');
-		} else {
+		} elseif (!password_verify($_POST['password'], $hash)) {
 			$errorMsg = 'Неверный логин, или пароль';
+			return $errorMsg;
+		} elseif ($user['banned'] == 1) {
+			$errorMsg = 'Вы забанены. Свяжитесь с администратором';
 			return $errorMsg;
 		}
 	} else {
 		$errorMsg = 'Неверный логин, или пароль';
 		return $errorMsg;
+	}
+}
+
+//FILEUPLOAD
+
+function my_upload() {
+	if (!empty ($_FILES['attachment-file']['tmp_name'])) {
+		$filePath  = $_FILES['attachment-file']['tmp_name'];
+		$fi = finfo_open(FILEINFO_MIME_TYPE);
+		$mime = (string) finfo_file($fi, $filePath);
+		if (strpos($mime, 'image') === false) {
+			$errorMsg = 'Можно загружать только изображения';
+			return $errorMsg;
+		}
+		$image = getimagesize($filePath);
+		$limitBytes  = 1024 * 1024 * 2;
+		$limitWidth  = 1280;
+		$limitHeight = 768;
+		if (filesize($filePath) > $limitBytes) {
+			$errorMsg = 'Размер изображения не должен превышать 2 Мбайт';
+			return $errorMsg;
+		}
+		if ($image[1] > $limitHeight) {
+			$errorMsg = 'Высота изображения не должна превышать 768 точек';
+			return $errorMsg;
+		}
+		if ($image[0] > $limitWidth) {
+			$errorMsg = 'Ширина изображения не должна превышать 1280 точек';
+			return $errorMsg;
+		}
+		return 'OK';
+	} else {
+		return 'OK';
 	}
 }

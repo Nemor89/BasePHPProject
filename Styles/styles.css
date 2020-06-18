@@ -52,6 +52,12 @@
   }
 }
 
+textarea:focus {
+	outline:none;
+	outline-offset: 0;
+	box-shadow: none;
+}
+
 html::-webkit-scrollbar{
     width: 10px;
     background-color: #1F2326;

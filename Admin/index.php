@@ -8,8 +8,8 @@ if ($_SESSION['status'] != 3){
 <html>
  <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" type="text/css" href="styles/styles.css">
-  <title>Главная страница</title>
+  <link rel="stylesheet" type="text/css" href="../styles/styles.css">
+  <title>Админка</title>
  </head>
  <body>
   <div class="main">

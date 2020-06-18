@@ -5,8 +5,8 @@ require_once '../functions/functions.php';
 <html>
  <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" type="text/css" href="styles/styles.css">
-  <title>Главная страница</title>
+  <link rel="stylesheet" type="text/css" href="../styles/styles.css">
+  <title>Пользователи</title>
  </head>
  <body>
   <div class="main">
