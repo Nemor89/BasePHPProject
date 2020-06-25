@@ -1,5 +1,8 @@
 <?php
 require_once '../functions/functions.php';
+if (!empty ($_POST['blogadd'])) {
+  $errorMsg = blog_add();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,18 +22,18 @@ require_once '../functions/functions.php';
         require_once "inc/leftmenu.php";
       ?>
        <div class="content">
-         <div class="errormsg">
+         <div class="errormsgblog">
          <span><?=$errorMsg?></span>
         </div>
         <form class="blogadd" action="blogadd.php" method="post" enctype="multipart/form-data">
             <p class="categoryp">Выберите категории:</p>
             <div class="categoryadddiv">
-              <input type="checkbox" id="category" name="category[]" value="WEB" multiple> WEB
-              <input type="checkbox" id="category" name="category[]" value="PHP" multiple> PHP
-              <input type="checkbox" id="category" name="category[]" value="HTML\CSS" multiple> HTML\CSS
-              <input type="checkbox" id="category" name="category[]" value="Спорт" multiple> Спорт
-              <input type="checkbox" id="category" name="category[]" value="Политика" multiple> Политика
-              <input type="checkbox" id="category" name="category[]" value="Разное" multiple> Разное
+              <input type="checkbox" id="category" name="category[]" value="1" multiple> WEB
+              <input type="checkbox" id="category" name="category[]" value="2" multiple> PHP
+              <input type="checkbox" id="category" name="category[]" value="3" multiple> HTML\CSS
+              <input type="checkbox" id="category" name="category[]" value="4" multiple> Спорт
+              <input type="checkbox" id="category" name="category[]" value="5" multiple> Политика
+              <input type="checkbox" id="category" name="category[]" value="6" multiple> Разное
           </div>
           <p class="categoryp">Введите описание блога:</p>
           <textarea class="blogadddesc" name="blogdesc"></textarea>

@@ -200,8 +200,8 @@ function registr() {
 	
 	$link = my_connect() or die (mysqli_error($link));
 
-	$login = trim($_POST['login']);
-	$email = trim($_POST['email']);
+	$login = trim(mysqli_real_escape_string($link, $_POST['login']));
+	$email = trim(mysqli_real_escape_string($link, $_POST['email']));
 	$password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
 
 	$query = "SELECT * FROM users WHERE username='$login'";
@@ -324,5 +324,101 @@ function my_upload() {
 		return 'OK';
 	} else {
 		return 'OK';
+	}
+}
+
+//BLOG ADD
+
+function blog_add() {
+
+	if (mb_strlen($_POST['blogdesc']) < 15 || mb_strlen($_POST['blogdesc']) > 126) {
+		$errorMsg = 'Описание должено быть длиной от 15 до 126 символов';
+		return $errorMsg; 
+	} elseif (empty($_POST['category'])) {
+		$errorMsg = 'Укажите хотя бы одну категорию';
+		return $errorMsg;
+	} elseif (mb_strlen($_POST['blogtext']) < 20) {
+		$errorMsg = 'Текст должен быть длиной не менее 20 символов';
+		return $errorMsg;
+	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
+		$errorMsg = my_upload();
+		return $errorMsg;
+	} elseif (empty ($_FILES['attachment-file']['tmp_name'])) {
+		$errorMsg = 'Добавьте картинку';
+		return $errorMsg;
+	} else {
+
+		$link = my_connect() or die (mysqli_error($link));
+
+		$description = trim(mysqli_real_escape_string($link, $_POST['blogdesc']));
+		$text = trim(mysqli_real_escape_string($link, $_POST['blogtext']));
+		$author = trim(mysqli_real_escape_string($link, $_SESSION['username']));
+		
+		$query = "INSERT INTO blogs (description, text, author) VALUES ('$description', '$text', '$author')";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		$id = mysqli_insert_id($link); // получаем последний добавленный id
+
+		if (!empty ($_FILES['attachment-file']['tmp_name'])) {
+			$pathInfo = pathinfo($_FILES['attachment-file']['name']);
+		    $exp = $pathInfo['extension'];
+		    $blogimg = '../img/blogimg/' . $id . '_img.' . $exp;
+			move_uploaded_file($_FILES['attachment-file']['tmp_name'], $blogimg);
+			$query = "UPDATE blogs SET picture='$blogimg' WHERE id='$id'";
+			$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		}
+
+		foreach ($_POST['category'] as $category_id) {
+			$query = "INSERT INTO blog_cat (blog_id, category_id) VALUES ('$id', '$category_id')";
+			$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		}
+	}
+}
+
+//BLOG VIEW
+
+function blog_view() {
+
+	if(empty($_GET['page']) or $_GET['page'] <= 1) {
+		$_GET['page'] = 1;
+		$page = $_GET['page'];
+	} else {
+		$page = $_GET['page'];
+	}
+
+	$notesOnPage = 4;
+	$from = ($page - 1) * $notesOnPage;
+
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM blogs LIMIT $from, $notesOnPage";
+	$result = mysqli_query($link, $query) or die (mysqli_error($link));
+	$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+	$i = 1;
+	foreach ($blogs as $blog) {
+        echo "<div class=\"blog{$i}\" id=\"blog{$i}\">";
+        echo "<p class=\"blogtext\">Дата добавления:" . $blog['date'] . "</p>";
+        echo "<p class=\"blogtext\">Автор:" . $blog['author'] . "</p>";
+        echo "<a href=\"#\"><img class=\"blogimg\" src=\"" . $blog['picture']. "\"></a>";
+        echo "<p class=\"description\">" . $blog['description'] . "</p>";
+        echo "</div>";
+        $i++;
+	}
+}
+
+function blog_buttons() {
+
+	$link = my_connect() or die (mysqli_error($link));
+	$query = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
+	$rows = mysqli_fetch_row($query)[0];
+
+	if(empty($_GET['page']) or $_GET['page'] <= 1) {
+		echo "<a id =\"prev\" href=\"/?page=" . $_GET['page'] . "\">Сюда</a>";
+	} else {
+		echo "<a id =\"prev\" href=\"/?page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
+	}
+	if ($_GET['page'] < ceil($rows / 4)) {
+		echo "<a id =\"next\" href=\"/?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+	} else {
+		echo "<a id =\"next\" href=\"/?page=" . $_GET['page'] . "\">Туда</a>";
 	}
 }

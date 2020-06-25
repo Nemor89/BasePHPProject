@@ -845,7 +845,7 @@ a#blogadd {
 	position: relative;
 	width: 80%;
 	margin: auto;
-	margin-top: 170px;
+	margin-top: 40px;
 	text-align: center;
 }
 
@@ -859,7 +859,7 @@ a#blogadd {
 	width: 80%;
 	height: 100px;
 	resize: none;
-	margin-bottom: 40px;
+	margin-bottom: 20px;
 }
 
 .blogaddtext {
@@ -935,4 +935,12 @@ a#blogadd {
 	cursor:pointer;
 	border: 2px solid #EE0C44;
 	border-radius: 3px;
+}
+
+.errormsgblog {
+	text-align: center;
+	position: relative;
+	margin-top: -70px;
+	color: #EE0C44;
+	font-size: 30px;
 }
