@@ -1,5 +1,8 @@
 <?php
 require_once 'functions/functions.php';
+if (!empty ($_POST['reviewsubmit'])) {
+  $errorMsg = review_submit();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,6 +22,9 @@ require_once 'functions/functions.php';
         require_once "inc/leftmenu.php";
       ?>
       <div class="content">
+        <div class="errormsg">
+         <span><?=$errorMsg?></span>
+        </div>
         <h1 class="about">Оставьте свой отзыв о работе сайта</h1>
         <form class="review" method="post">
         <textarea class="reviewarea" name="review"></textarea>

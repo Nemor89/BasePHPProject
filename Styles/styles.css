@@ -944,3 +944,70 @@ a#blogadd {
 	color: #EE0C44;
 	font-size: 30px;
 }
+
+a#blogtable {
+	text-decoration: none;
+	color: #EE0C44;
+}
+
+a#prev_admin, a#next_admin { /*КНОПКИ ПЕРЕКЛЮЧЕНИЯ СТРАНИЦ В АДМИНКЕ*/
+	position: absolute;
+	width: 100px;
+	padding: 5px;
+	text-decoration: none;
+	text-align: center;
+	color: white;
+	font-size: 20px;
+	font-family: "Roboto Condensed",sans-serif;
+	font-weight: 600;
+	background: linear-gradient(315deg,#ff0057,#e64a19);
+	border-radius: 5px;
+	margin-bottom: 10px;
+	left: 60%;
+	margin-top: 40px;
+	box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+
+a#prev_admin {
+	margin-left: -70px;
+}
+
+a#next_admin {
+	margin-left: 70px;
+}
+
+a#prev_admin:hover {
+	background: linear-gradient(315deg,#e91e63,#5d02ff);
+	-webkit-animation: swing 0.6s ease;
+  	animation: swing 0.6s ease;
+   	-webkit-animation-iteration-count: 1;
+   	animation-iteration-count: 1;
+}
+
+a#next_admin:hover {
+	background: linear-gradient(315deg,#e91e63,#5d02ff);
+	-webkit-animation: swing 0.6s ease;
+  	animation: swing 0.6s ease;
+   	-webkit-animation-iteration-count: 1;
+   	animation-iteration-count: 1;
+}
+
+p#count {
+	color: white;
+	font-family: "Roboto Condensed",sans-serif;
+	font-size: 22px;
+}
+
+#number {
+	color: #EE0C44;
+	font-family: "Roboto Condensed",sans-serif;
+	font-size: 22px;
+}
+
+#stat {
+	text-align: center;
+	font-size: 30px;
+	font-weight: 600;
+	color: white;
+	margin-bottom: 80px;
+}

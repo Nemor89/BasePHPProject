@@ -24,22 +24,20 @@ require_once '../functions/functions.php';
         </div>
           <table class="adminblogs" border="1" cellpadding="5" cellspacing="0">
             <tr>
-              <th>id</th>
-              <th>дата</th>
-              <th>автор</th>
-              <th>описание</th>
-              <th>редактировать</th>
-              <th>удалить</th>
+              <th>ID</th>
+              <th>Дата</th>
+              <th>Автор</th>
+              <th>Описание</th>
+              <th>Редактировать</th>
+              <th>Удалить</th>
             </tr>
-            <tr>
-              <td>1</td>
-              <td>20.05.29</td>
-              <td>Nemor89</td>
-              <td>описанописаниеописаниеиописаниее</td>
-              <td>редактировать</td>
-              <td>удалить</td>
-            </tr>
+              <?php
+                blog_view_admin();
+              ?>
           </table>
+              <?php
+                blog_buttons_admin();
+              ?>
       </div>
      </div>
    </main>

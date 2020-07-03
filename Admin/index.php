@@ -22,9 +22,10 @@ if ($_SESSION['status'] != 3){
         require_once "inc/leftmenu.php";
       ?>
        <div class="content">
-        <form class="regform" method="post" enctype="multipart/form-data">
-          <h1>АДМИНКА</h1>
-        </form>
+          <h1 id='stat'>СТАТИСТИКА САЙТА:</h1>
+          <?php
+          statistics();
+          ?>
       </div>
      </div>
    </main>

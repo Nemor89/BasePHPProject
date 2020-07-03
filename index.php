@@ -20,8 +20,8 @@ require_once 'functions/functions.php';
       ?>
       <div class="blogs">
           <?php
-          echo blog_view();
-          echo blog_buttons();
+          blog_view();
+          blog_buttons();
           ?>
       </div>
      </div>

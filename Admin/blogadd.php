@@ -9,6 +9,15 @@ if (!empty ($_POST['blogadd'])) {
  <head>
   <meta charset="utf-8">
   <link rel="stylesheet" type="text/css" href="../styles/styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('input[type="file"]').change(function(){
+      var value = $("input[type='file']").val();
+      $('.js-value').text(value);
+      }); 
+    });
+  </script>
   <title>Блоги</title>
  </head>
  <body>

@@ -255,7 +255,8 @@ function registr() {
 
 	session_start();
 	$_SESSION['auth'] = true;
-	$_SESSION['username'] = $user ['username'];
+	$_SESSION['username'] = $user['username'];
+	$_SESSION['userid'] = $user['id'];
 	$_SESSION['status'] = $user['status_id'];
 
 	header('Location: index.php');
@@ -279,6 +280,7 @@ function authorization() {
 			session_start();
 			$_SESSION['auth'] = true;
 			$_SESSION['username'] = $user ['username'];
+			$_SESSION['userid'] = $user['id'];
 			$_SESSION['status'] = $user['status_id'];
 			header('Location: index.php');
 		} elseif (!password_verify($_POST['password'], $hash)) {
@@ -378,30 +380,36 @@ function blog_add() {
 
 function blog_view() {
 
-	if(empty($_GET['page']) or $_GET['page'] <= 1) {
-		$_GET['page'] = 1;
-		$page = $_GET['page'];
-	} else {
-		$page = $_GET['page'];
-	}
-
-	$notesOnPage = 4;
-	$from = ($page - 1) * $notesOnPage;
-
 	$link = my_connect() or die (mysqli_error($link));
-	$query = "SELECT * FROM blogs LIMIT $from, $notesOnPage";
-	$result = mysqli_query($link, $query) or die (mysqli_error($link));
-	$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+	$query = "SELECT * FROM blogs";
+	$resultblogs = mysqli_query($link, $query) or die (mysqli_error($link));
+	
+	if (mysqli_num_rows($resultblogs) > 0) {
 
-	$i = 1;
-	foreach ($blogs as $blog) {
-        echo "<div class=\"blog{$i}\" id=\"blog{$i}\">";
-        echo "<p class=\"blogtext\">Дата добавления:" . $blog['date'] . "</p>";
-        echo "<p class=\"blogtext\">Автор:" . $blog['author'] . "</p>";
-        echo "<a href=\"#\"><img class=\"blogimg\" src=\"" . $blog['picture']. "\"></a>";
-        echo "<p class=\"description\">" . $blog['description'] . "</p>";
-        echo "</div>";
-        $i++;
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			$_GET['page'] = 1;
+			$page = $_GET['page'];
+		} else {
+			$page = $_GET['page'];
+		}
+	
+		$notesOnPage = 4;
+		$from = ($page - 1) * $notesOnPage;
+		
+		$query = "SELECT * FROM blogs LIMIT $from, $notesOnPage";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+	
+		$i = 1;
+		foreach ($blogs as $blog) {
+	        echo "<div class=\"blog{$i}\" id=\"blog{$i}\">";
+	        echo "<p class=\"blogtext\">Дата добавления:" . $blog['date'] . "</p>";
+	        echo "<p class=\"blogtext\">Автор:" . $blog['author'] . "</p>";
+	        echo "<a href=\"#\"><img class=\"blogimg\" src=\"" . $blog['picture']. "\"></a>";
+	        echo "<p class=\"description\">" . $blog['description'] . "</p>";
+	        echo "</div>";
+	        $i++;
+		}
 	}
 }
 
@@ -420,5 +428,163 @@ function blog_buttons() {
 		echo "<a id =\"next\" href=\"/?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
 	} else {
 		echo "<a id =\"next\" href=\"/?page=" . $_GET['page'] . "\">Туда</a>";
+	}
+}
+
+function blog_view_admin() {
+
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM blogs";
+	$resultBlogs = mysqli_query($link, $query) or die (mysqli_error($link));
+	
+	if (mysqli_num_rows($resultBlogs) > 0) {
+
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			$_GET['page'] = 1;
+			$page = $_GET['page'];
+		} else {
+			$page = $_GET['page'];
+		}
+	
+		$notesOnPage = 23;
+		$from = ($page - 1) * $notesOnPage;
+		
+		$query = "SELECT * FROM blogs LIMIT $from, $notesOnPage";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+		foreach ($blogs as $blog) {
+			echo "<tr>";
+			echo "<td>" . $blog['id'] ."</td>";
+            echo "<td>" . $blog['date'] ."</td>";
+            echo "<td>" . $blog['author'] ."</td>";
+            echo "<td>" . $blog['description'] ."</td>";
+            echo "<td><a id =\"blogtable\" href=\"blogedit.php/?edit=" . $blog['id'] . "\"</a>Редактировать</td>";
+            echo "<td><a id =\"blogtable\" href=\"blogdel.php/?del=" . $blog['id'] . "\"</a>Удалить</td>";
+            echo "</tr>";
+		}
+	}
+}
+
+function blog_buttons_admin() {
+
+	$link = my_connect() or die (mysqli_error($link));
+	$query = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
+	$rows = mysqli_fetch_row($query)[0];
+
+	if(empty($_GET['page']) or $_GET['page'] <= 1) {
+		echo "<a id =\"prev_admin\" href=\"?page=" . $_GET['page'] . "\">Сюда</a>";
+	} else {
+		echo "<a id =\"prev_admin\" href=\"?page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
+	}
+	if ($_GET['page'] < ceil($rows / 23)) {
+		echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+	} else {
+		echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
+	}
+}
+
+// ADMIN HOME PAGE
+function statistics() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query1 = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
+	$blogs = mysqli_fetch_row($query1)[0];
+	$query2 = mysqli_query($link, "SELECT COUNT(*) FROM users");
+	$users = mysqli_fetch_row($query2)[0];
+	$query3 = mysqli_query($link, "SELECT COUNT(*) FROM comments");
+	$comments = mysqli_fetch_row($query3)[0];
+	$query4 = mysqli_query($link, "SELECT COUNT(*) FROM reviews");
+	$reviews = mysqli_fetch_row($query4)[0];
+	echo "<p id=\"count\">Всего опубликовано <span id=\"number\">$blogs</span> блогов.</p>";
+	echo "<p id=\"count\">Всего зарегистрировано <span id=\"number\">$users</span> пользователей.</p>";
+	echo "<p id=\"count\">Всего оставлено <span id=\"number\">$comments</span> комментариев.</p>";
+	echo "<p id=\"count\">Всего оставлено <span id=\"number\">$reviews</span> отзывов.</p>";
+}
+
+// ADMIN USERS
+function users_view() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM users";
+	$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
+	
+	if (mysqli_num_rows($resultUsers) > 0) {
+
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			$_GET['page'] = 1;
+			$page = $_GET['page'];
+		} else {
+			$page = $_GET['page'];
+		}
+	
+		$notesOnPage = 23;
+		$from = ($page - 1) * $notesOnPage;
+		
+
+		$query = "SELECT * FROM users INNER JOIN status ON status.id=users.status_id";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		$users = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+		foreach ($users as $user) {
+			echo "<tr>";
+			echo "<td>" . $user['id'] ."</td>";
+            echo "<td>" . $user['username'] ."</td>";
+            echo "<td>" . $user['status'] ."</td>";
+            echo "<td><a id =\"blogtable\" href=\"userdel.php/?edit=" . $user['id'] . "\"</a>Удалить</td>";
+            echo "<td><a id =\"blogtable\" href=\"userban.php/?del=" . $user['id'] . "\"</a>Забанить</td>";
+            echo "</tr>";
+		}
+	}
+}
+
+// ADD REVIEWS
+function review_submit() {
+	if ($_SESSION['auth'] !== true) {
+		$errorMsg = 'Чтобы оставить отзыв необходимо авторизоваться!';
+		return $errorMsg;
+	} else {
+		$review = $_POST['review'];
+		$userID = $_SESSION['userid'];
+	
+		$link = my_connect() or die (mysqli_error($link));
+		$query = "INSERT INTO reviews SET user_id={$userID}, review='$review'";
+		$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		$errorMsg = 'Спасибо за отзыв!';
+		return $errorMsg;
+	}
+}
+
+function reviews_view() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM reviews";
+	$resultReviews = mysqli_query($link, $query) or die (mysqli_error($link));
+	
+	if (mysqli_num_rows($resultReviews) > 0) {
+
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			$_GET['page'] = 1;
+			$page = $_GET['page'];
+		} else {
+			$page = $_GET['page'];
+		}
+	
+		$notesOnPage = 23;
+		$from = ($page - 1) * $notesOnPage;
+		
+
+		$query = "SELECT *, reviews.id as reviews_id FROM reviews INNER JOIN users ON reviews.user_id=users.id";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		$reviews = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+		foreach ($reviews as $review) {
+			echo "<tr>";
+			echo "<td>" . $review['reviews_id'] ."</td>";
+            echo "<td>" . $review['username'] ."</td>";
+            echo "<td>" . $review['date'] ."</td>";
+            echo "<td><a id =\"blogtable\" href=\"reviewread.php/?edit=" . $review['id'] . "\"</a>Читать</td>";
+            echo "<td><a id =\"blogtable\" href=\"reviewdel.php/?del=" . $review['id'] . "\"</a>Удалить</td>";
+            echo "</tr>";
+		}
 	}
 }
