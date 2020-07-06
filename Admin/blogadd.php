@@ -37,12 +37,9 @@ if (!empty ($_POST['blogadd'])) {
         <form class="blogadd" action="blogadd.php" method="post" enctype="multipart/form-data">
             <p class="categoryp">Выберите категории:</p>
             <div class="categoryadddiv">
-              <input type="checkbox" id="category" name="category[]" value="1" multiple> WEB
-              <input type="checkbox" id="category" name="category[]" value="2" multiple> PHP
-              <input type="checkbox" id="category" name="category[]" value="3" multiple> HTML\CSS
-              <input type="checkbox" id="category" name="category[]" value="4" multiple> Спорт
-              <input type="checkbox" id="category" name="category[]" value="5" multiple> Политика
-              <input type="checkbox" id="category" name="category[]" value="6" multiple> Разное
+            <?php
+              categories();
+            ?>
           </div>
           <p class="categoryp">Введите описание блога:</p>
           <textarea class="blogadddesc" name="blogdesc"></textarea>

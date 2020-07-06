@@ -459,8 +459,8 @@ function blog_view_admin() {
             echo "<td>" . $blog['date'] ."</td>";
             echo "<td>" . $blog['author'] ."</td>";
             echo "<td>" . $blog['description'] ."</td>";
-            echo "<td><a id =\"blogtable\" href=\"blogedit.php/?edit=" . $blog['id'] . "\"</a>Редактировать</td>";
-            echo "<td><a id =\"blogtable\" href=\"blogdel.php/?del=" . $blog['id'] . "\"</a>Удалить</td>";
+            echo "<td><a id =\"blogtable\" href=\"blogedit.php?edit=" . $blog['id'] . "\"</a>Редактировать</td>";
+            echo "<td><a id =\"blogtable\" href=\"blogdel.php?del=" . $blog['id'] . "\"</a>Удалить</td>";
             echo "</tr>";
 		}
 	}
@@ -530,8 +530,8 @@ function users_view() {
 			echo "<td>" . $user['id'] ."</td>";
             echo "<td>" . $user['username'] ."</td>";
             echo "<td>" . $user['status'] ."</td>";
-            echo "<td><a id =\"blogtable\" href=\"userdel.php/?edit=" . $user['id'] . "\"</a>Удалить</td>";
-            echo "<td><a id =\"blogtable\" href=\"userban.php/?del=" . $user['id'] . "\"</a>Забанить</td>";
+            echo "<td><a id =\"blogtable\" href=\"userdel.php?edit=" . $user['id'] . "\"</a>Удалить</td>";
+            echo "<td><a id =\"blogtable\" href=\"userban.php?del=" . $user['id'] . "\"</a>Забанить</td>";
             echo "</tr>";
 		}
 	}
@@ -582,9 +582,106 @@ function reviews_view() {
 			echo "<td>" . $review['reviews_id'] ."</td>";
             echo "<td>" . $review['username'] ."</td>";
             echo "<td>" . $review['date'] ."</td>";
-            echo "<td><a id =\"blogtable\" href=\"reviewread.php/?edit=" . $review['id'] . "\"</a>Читать</td>";
-            echo "<td><a id =\"blogtable\" href=\"reviewdel.php/?del=" . $review['id'] . "\"</a>Удалить</td>";
+            echo "<td><a id =\"blogtable\" href=\"reviewread.php?edit=" . $review['id'] . "\"</a>Читать</td>";
+            echo "<td><a id =\"blogtable\" href=\"reviewdel.php?del=" . $review['id'] . "\"</a>Удалить</td>";
             echo "</tr>";
 		}
+	}
+}
+
+function blog_edit() {
+	if (mb_strlen($_POST['blogdesc']) < 15 || mb_strlen($_POST['blogdesc']) > 126) {
+		$errorMsg = 'Описание должено быть длиной от 15 до 126 символов';
+		return $errorMsg; 
+	} elseif (empty($_POST['category'])) {
+		$errorMsg = 'Укажите хотя бы одну категорию';
+		return $errorMsg;
+	} elseif (mb_strlen($_POST['blogtext']) < 20) {
+		$errorMsg = 'Текст должен быть длиной не менее 20 символов';
+		return $errorMsg;
+	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
+		$errorMsg = my_upload();
+		return $errorMsg;
+	} elseif (empty ($_FILES['attachment-file']['tmp_name'])) {
+		$errorMsg = 'Добавьте картинку';
+		return $errorMsg;
+	} else {
+
+		$link = my_connect() or die (mysqli_error($link));
+
+		$description = trim(mysqli_real_escape_string($link, $_POST['blogdesc']));
+		$text = trim(mysqli_real_escape_string($link, $_POST['blogtext']));
+		$author = trim(mysqli_real_escape_string($link, $_SESSION['username']));
+		
+		$query = "INSERT INTO blogs (description, text, author) VALUES ('$description', '$text', '$author')";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		$id = mysqli_insert_id($link); // получаем последний добавленный id
+
+		if (!empty ($_FILES['attachment-file']['tmp_name'])) {
+			$pathInfo = pathinfo($_FILES['attachment-file']['name']);
+		    $exp = $pathInfo['extension'];
+		    $blogimg = '../img/blogimg/' . $id . '_img.' . $exp;
+			move_uploaded_file($_FILES['attachment-file']['tmp_name'], $blogimg);
+			$query = "UPDATE blogs SET picture='$blogimg' WHERE id='$id'";
+			$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		}
+
+		foreach ($_POST['category'] as $category_id) {
+			$query = "INSERT INTO blog_cat (blog_id, category_id) VALUES ('$id', '$category_id')";
+			$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		}
+	}
+}
+
+function blog_edit_view() {
+	$id = $_GET['edit'];
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT blogs.id, blogs.description, blogs.text, categories.name as category_name FROM blogs INNER JOIN blog_cat ON blogs.id=blog_cat.blog_id INNER JOIN categories ON blog_cat.category_id=categories.id WHERE blogs.id=$id";
+	$resultBlog = mysqli_query($link, $query) or die (mysqli_error($link));
+	$blog = mysqli_fetch_all($resultBlog, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+	echo "<p class=\"categoryp\">Выберите категории:</p>";
+	echo "<div class=\"categoryadddiv\">";
+	categories($id, $blog);
+	echo "</div>";
+	echo "<p class=\"categoryp\">Введите описание блога:</p>";
+	echo "<textarea class=\"blogadddesc\" name=\"blogdesc\">" . $blog[0]['description'] . "</textarea>";
+	echo "<p class=\"categoryp\">Введите текст блога:</p>";
+	echo "<textarea class=\"blogaddtext\" name=\"blogtext\">" . $blog[0]['text'] . "</textarea>";
+	echo "<div class=\"example-2\">";
+    echo "<label for=\"custom-file-upload\" class=\"filupp\"><span class=\"filupp-file-name js-value\">Загрузить картинку</span>";
+    echo "<input type=\"file\" class=\"avatar\" name=\"attachment-file\" value=\"1\" id=\"custom-file-upload\" accept=\"image/jpeg,image/png\">";
+    echo "</label>";
+    echo "</div>";
+    echo "<input class=\"regbtn\" type=\"submit\" name=\"blogedit\" value=\"Изменить\">";
+}
+
+function categories($id = null, $blog = null) {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM categories";
+	$resultCat = mysqli_query($link, $query) or die (mysqli_error($link));
+	$categories = mysqli_fetch_all($resultCat, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+	if (isset ($id) && isset ($blog)) {
+		foreach ($blog as $catname) {
+			$arr[] = $catname['category_name'];
+		}
+
+		$value = 1;
+		foreach ($categories as $category) {
+			if (in_array($category['name'], $arr)) {
+				echo "<input type=\"checkbox\" id=\"category\" name=\"category[]\" value=\"" . $value . "\" multiple checked>" . $category['name'];
+				$value++;
+			} else {
+				echo "<input type=\"checkbox\" id=\"category\" name=\"category[]\" value=\"" . $value . "\" multiple>" . $category['name'];
+				$value++;	
+			}
+		}		
+	} else {
+		$value = 1;
+		foreach ($categories as $category) {
+		echo "<input type=\"checkbox\" id=\"category\" name=\"category[]\" value=\"" . $value . "\" multiple>" . $category['name'];
+		$value++;
+		}	
 	}
 }

@@ -1,15 +1,12 @@
 <?php
 require_once '../functions/functions.php';
-if ($_SESSION['status'] != 3){
-  header('Location: ../index.php');
-} else {
 ?>
 <!DOCTYPE html>
 <html>
  <head>
   <meta charset="utf-8">
   <link rel="stylesheet" type="text/css" href="../styles/styles.css">
-  <title>Админка</title>
+  <title>Блоги</title>
  </head>
  <body>
   <div class="main">
@@ -22,10 +19,16 @@ if ($_SESSION['status'] != 3){
         require_once "inc/leftmenu.php";
       ?>
        <div class="content">
-          <h1 id='stat'>Статистика сайта:</h1>
+        <div class="errormsgblog">
+         <span><?=$errorMsg?></span>
+        </div>
+        <form class="blogadd" action="blogadd.php" method="post" enctype="multipart/form-data">
           <?php
-          statistics();
+            if (isset ($_GET['edit'])) {
+              blog_edit_view();
+            }
           ?>
+        </form>
       </div>
      </div>
    </main>
@@ -35,6 +38,3 @@ if ($_SESSION['status'] != 3){
   </div>
  </body>
 </html>
-<?php
-}
-?>

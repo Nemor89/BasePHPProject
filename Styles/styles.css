@@ -875,6 +875,10 @@ a#blogadd {
 	margin-bottom: 40px;
 }
 
+#category {
+	margin: 10px;
+}
+
 .categoryadddiv {
 	background-color: #181E23;
 	padding: 5px;
