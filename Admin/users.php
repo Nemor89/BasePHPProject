@@ -27,6 +27,7 @@ require_once '../functions/functions.php';
               <th>Статус</th>
               <th>Удалить</th>
               <th>Забанить</th>
+              <th>Сменить статус</th>
             </tr>
             <?php
               users_view();

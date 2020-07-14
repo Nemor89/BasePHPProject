@@ -403,8 +403,8 @@ function blog_view() {
 		$i = 1;
 		foreach ($blogs as $blog) {
 	        echo "<div class=\"blog{$i}\" id=\"blog{$i}\">";
-	        echo "<p class=\"blogtext\">Дата добавления:" . $blog['date'] . "</p>";
-	        echo "<p class=\"blogtext\">Автор:" . $blog['author'] . "</p>";
+	        echo "<p class=\"blogtext\">Дата добавления: " . $blog['date'] . "</p>";
+	        echo "<p class=\"blogtext\">Автор: " . $blog['author'] . "</p>";
 	        echo "<a href=\"#\"><img class=\"blogimg\" src=\"" . $blog['picture']. "\"></a>";
 	        echo "<p class=\"description\">" . $blog['description'] . "</p>";
 	        echo "</div>";
@@ -467,9 +467,16 @@ function blog_view_admin() {
 }
 
 function blog_buttons_admin() {
+	$uri = explode('?', $_SERVER['REQUEST_URI']);
 
 	$link = my_connect() or die (mysqli_error($link));
-	$query = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
+	if ($uri[0] == '/admin/users.php') {
+		$query = mysqli_query($link, "SELECT COUNT(*) FROM users");
+	} elseif ($uri[0] == '/admin/blogs.php') {
+		$query = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
+	} elseif ($uri[0] == '/admin/reviews.php') {
+		$query = mysqli_query($link, "SELECT COUNT(*) FROM reviews");
+	}
 	$rows = mysqli_fetch_row($query)[0];
 
 	if(empty($_GET['page']) or $_GET['page'] <= 1) {
@@ -520,7 +527,7 @@ function users_view() {
 		$from = ($page - 1) * $notesOnPage;
 		
 
-		$query = "SELECT * FROM users INNER JOIN status ON status.id=users.status_id";
+		$query = "SELECT * FROM users INNER JOIN status ON status.id=users.status_id LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 
 		$users = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
@@ -532,6 +539,7 @@ function users_view() {
             echo "<td>" . $user['status'] ."</td>";
             echo "<td><a id =\"blogtable\" href=\"userdel.php?edit=" . $user['id'] . "\"</a>Удалить</td>";
             echo "<td><a id =\"blogtable\" href=\"userban.php?del=" . $user['id'] . "\"</a>Забанить</td>";
+            echo "<td><a id =\"blogtable\" href=\"userban.php?status=" . $user['id'] . "\"</a>Сменить статус</td>";
             echo "</tr>";
 		}
 	}
@@ -573,7 +581,7 @@ function reviews_view() {
 		$from = ($page - 1) * $notesOnPage;
 		
 
-		$query = "SELECT *, reviews.id as reviews_id FROM reviews INNER JOIN users ON reviews.user_id=users.id";
+		$query = "SELECT *, reviews.id as reviews_id FROM reviews INNER JOIN users ON reviews.user_id=users.id LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 
 		$reviews = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
@@ -613,9 +621,10 @@ function blog_edit() {
 		$text = trim(mysqli_real_escape_string($link, $_POST['blogtext']));
 		$author = trim(mysqli_real_escape_string($link, $_SESSION['username']));
 		
-		$query = "INSERT INTO blogs (description, text, author) VALUES ('$description', '$text', '$author')";
+		$id = $_GET['edit'];
+		$date = date('Y-m-d H:i:s');
+		$query = "UPDATE blogs SET date='$date', description='$description', text='$text', author='$author' WHERE id=$id";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
-		$id = mysqli_insert_id($link); // получаем последний добавленный id
 
 		if (!empty ($_FILES['attachment-file']['tmp_name'])) {
 			$pathInfo = pathinfo($_FILES['attachment-file']['name']);
@@ -626,10 +635,10 @@ function blog_edit() {
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
 
-		foreach ($_POST['category'] as $category_id) {
-			$query = "INSERT INTO blog_cat (blog_id, category_id) VALUES ('$id', '$category_id')";
-			$result = mysqli_query($link, $query) or die (mysqli_error($link));
-		}
+		// 	foreach ($_POST['category'] as $category_id) {
+		// 	$query = "INSERT INTO blog_cat (blog_id, category_id) VALUES ('$id', '$category_id')";
+		// 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		// }
 	}
 }
 

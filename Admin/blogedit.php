@@ -1,11 +1,23 @@
 <?php
 require_once '../functions/functions.php';
+if (!empty ($_POST['blogedit'])) {
+  $errorMsg = blog_edit();
+}
 ?>
 <!DOCTYPE html>
 <html>
  <head>
   <meta charset="utf-8">
   <link rel="stylesheet" type="text/css" href="../styles/styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('input[type="file"]').change(function(){
+      var value = $("input[type='file']").val();
+      $('.js-value').text(value);
+      }); 
+    });
+  </script>
   <title>Блоги</title>
  </head>
  <body>
@@ -22,7 +34,7 @@ require_once '../functions/functions.php';
         <div class="errormsgblog">
          <span><?=$errorMsg?></span>
         </div>
-        <form class="blogadd" action="blogadd.php" method="post" enctype="multipart/form-data">
+        <form class="blogadd" method="post" enctype="multipart/form-data">
           <?php
             if (isset ($_GET['edit'])) {
               blog_edit_view();
