@@ -339,6 +339,9 @@ function blog_add() {
 	} elseif (empty($_POST['category'])) {
 		$errorMsg = 'Укажите хотя бы одну категорию';
 		return $errorMsg;
+	} elseif (count($_POST['category']) > 5) {
+		$errorMsg = 'Укажите не более пяти категорий';
+		return $errorMsg;
 	} elseif (mb_strlen($_POST['blogtext']) < 20) {
 		$errorMsg = 'Текст должен быть длиной не менее 20 символов';
 		return $errorMsg;
@@ -374,6 +377,7 @@ function blog_add() {
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
 	}
+	header('Location: /admin/blogs.php');
 }
 
 //BLOG VIEW
@@ -446,12 +450,20 @@ function blog_view_admin() {
 			$page = $_GET['page'];
 		}
 	
-		$notesOnPage = 23;
+		$notesOnPage = 6;
 		$from = ($page - 1) * $notesOnPage;
-		
+
+		// ВЫБОРКА КАТЕГОРИЙ
+		$query = "SELECT DISTINCT blog_id, blogs.id as blogs_id, date, author, description, name FROM blogs INNER JOIN blog_cat on blogs.id=blog_cat.blog_id INNER JOIN categories on blog_cat.category_id=categories.id";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		$cats = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+		foreach ($cats as $key => $value) {
+			$arr[] = [$value["blogs_id"] => $value['name']];
+		}
+
+		// ВЫБОРКА БЛОГОВ
 		$query = "SELECT * FROM blogs LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
-
 		$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
 		foreach ($blogs as $blog) {
 			echo "<tr>";
@@ -459,8 +471,17 @@ function blog_view_admin() {
             echo "<td>" . $blog['date'] ."</td>";
             echo "<td>" . $blog['author'] ."</td>";
             echo "<td>" . $blog['description'] ."</td>";
+            echo "<td>";
+            foreach ($arr as $key => $cat) {
+            	foreach ($cat as $key => $value) {
+            		if ($key == $blog['id']){
+                   	echo $cat[$key] . '<br>';
+            		}
+            	}
+            }
+            echo "</td>";
             echo "<td><a id =\"blogtable\" href=\"blogedit.php?edit=" . $blog['id'] . "\"</a>Редактировать</td>";
-            echo "<td><a id =\"blogtable\" href=\"blogdel.php?del=" . $blog['id'] . "\"</a>Удалить</td>";
+            echo "<td><a id =\"blogtable\" href=\"?del=" . $blog['id'] . "\"</a>Удалить</td>";
             echo "</tr>";
 		}
 	}
@@ -484,10 +505,18 @@ function blog_buttons_admin() {
 	} else {
 		echo "<a id =\"prev_admin\" href=\"?page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
 	}
-	if ($_GET['page'] < ceil($rows / 23)) {
-		echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+	if ($uri[0] == '/admin/blogs.php') {
+		if ($_GET['page'] < ceil($rows / 6)) {
+			echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+		} else {
+			echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
+		}
 	} else {
-		echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
+		if ($_GET['page'] < ceil($rows / 23)) {
+			echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+		} else {
+			echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
+		}
 	}
 }
 
@@ -527,19 +556,23 @@ function users_view() {
 		$from = ($page - 1) * $notesOnPage;
 		
 
-		$query = "SELECT * FROM users INNER JOIN status ON status.id=users.status_id LIMIT $from, $notesOnPage";
+		$query = "SELECT *, users.id as user_id FROM users INNER JOIN status ON status.id=users.status_id ORDER BY user_id LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 
 		$users = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
 
 		foreach ($users as $user) {
 			echo "<tr>";
-			echo "<td>" . $user['id'] ."</td>";
-            echo "<td>" . $user['username'] ."</td>";
-            echo "<td>" . $user['status'] ."</td>";
-            echo "<td><a id =\"blogtable\" href=\"userdel.php?edit=" . $user['id'] . "\"</a>Удалить</td>";
-            echo "<td><a id =\"blogtable\" href=\"userban.php?del=" . $user['id'] . "\"</a>Забанить</td>";
-            echo "<td><a id =\"blogtable\" href=\"userban.php?status=" . $user['id'] . "\"</a>Сменить статус</td>";
+			echo "<td>" . $user['user_id'] . "</td>";
+            echo "<td>" . $user['username'] . "</td>";
+            echo "<td>" . $user['status'] . "</td>";
+            echo "<td><a id =\"blogtable\" href=\"?del=" . $user['user_id'] . "\"</a>Удалить</td>";
+            if ($user['banned'] == 0) {
+            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Забанить</td>";
+            } elseif ($user['banned'] == 1) {
+            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Разбанить</td>";
+            }
+            echo "<td><a id =\"blogtable\" href=\"userstatus.php?status=" . $user['user_id'] . "\"</a>Сменить статус</td>";
             echo "</tr>";
 		}
 	}
@@ -590,11 +623,19 @@ function reviews_view() {
 			echo "<td>" . $review['reviews_id'] ."</td>";
             echo "<td>" . $review['username'] ."</td>";
             echo "<td>" . $review['date'] ."</td>";
-            echo "<td><a id =\"blogtable\" href=\"reviewread.php?edit=" . $review['id'] . "\"</a>Читать</td>";
-            echo "<td><a id =\"blogtable\" href=\"reviewdel.php?del=" . $review['id'] . "\"</a>Удалить</td>";
+            echo "<td><a id =\"blogtable\" href=\"reviewread.php?readrev=" . $review['reviews_id'] . "\"</a>Читать</td>";
+            echo "<td><a id =\"blogtable\" href=\"?delrev=" . $review['reviews_id'] . "\"</a>Удалить</td>";
             echo "</tr>";
 		}
 	}
+}
+
+function review_del() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "DELETE FROM reviews WHERE id={$_GET['delrev']}";
+	$resultBlogDel = mysqli_query($link, $query) or die (mysqli_error($link));
+	$errorMsg = 'Отзыв удален';
+	return $errorMsg;
 }
 
 function blog_edit() {
@@ -635,11 +676,15 @@ function blog_edit() {
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
 
-		// 	foreach ($_POST['category'] as $category_id) {
-		// 	$query = "INSERT INTO blog_cat (blog_id, category_id) VALUES ('$id', '$category_id')";
-		// 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
-		// }
+		$query = "DELETE FROM blog_cat WHERE blog_id=$id";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		foreach ($_POST['category'] as $category_id) {
+			$query = "INSERT INTO blog_cat (blog_id, category_id) VALUES ('$id', '$category_id')";
+			$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		}
 	}
+
+	header('Location: /admin/blogs.php');
 }
 
 function blog_edit_view() {
@@ -693,4 +738,92 @@ function categories($id = null, $blog = null) {
 		$value++;
 		}	
 	}
+}
+
+function blog_del() {
+	$id = $_GET['del'];
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "DELETE FROM blogs WHERE id=$id";
+	$resultBlogDel = mysqli_query($link, $query) or die (mysqli_error($link));
+	$query = "DELETE FROM blog_cat WHERE blog_id=$id";
+	$resultCatDel = mysqli_query($link, $query) or die (mysqli_error($link));
+	$errorMsg = 'Блог удален';
+	return $errorMsg;
+}
+
+function user_del() {
+	$id = $_GET['del'];
+	if ($_SESSION['userid'] == $id) {
+		$errorMsg = 'Нельзя удалить текущего пользователя';
+		return $errorMsg;
+	}
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "DELETE FROM users WHERE id=$id";
+	$resultBlogDel = mysqli_query($link, $query) or die (mysqli_error($link));
+	$errorMsg = 'Пользователь удален';
+	return $errorMsg;
+}
+
+function user_ban() {
+	$id = $_GET['ban'];
+	if ($_SESSION['userid'] == $id) {
+		$errorMsg = 'Нельзя забанить текущего пользователя';
+		return $errorMsg;
+	}
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM users WHERE id=$id";
+	$resultUser = mysqli_query($link, $query) or die (mysqli_error($link));
+	$user = mysqli_fetch_all($resultUser, MYSQLI_ASSOC) or die (mysqli_error($link));
+	if ($user[0]["banned"] == 0) {
+		$query = "UPDATE users SET banned=1 WHERE id=$id";
+		$resultUser = mysqli_query($link, $query) or die (mysqli_error($link));
+		header('Location: /admin/users.php');
+	} elseif ($user[0]["banned"] == 1) {
+		$query = "UPDATE users SET banned=0 WHERE id=$id";
+		$resultUser = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		header('Location: /admin/users.php');
+	}
+
+}
+
+function user_status() {
+	$id = $_GET['status'];
+
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM status";
+	$resultStatus = mysqli_query($link, $query) or die (mysqli_error($link));
+	$status = mysqli_fetch_all($resultStatus, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+	$query = "SELECT *, users.id as user_id FROM users INNER JOIN status ON status.id=users.status_id WHERE users.id=$id";
+	$result = mysqli_query($link, $query) or die (mysqli_error($link));
+	$user = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+	echo "<div class=\"categoryadddiv\">";
+		foreach ($status as $value) {
+			if ($user[0]['status'] == $value['status']) {
+				echo "<input type=\"radio\" id=\"category\" name=\"statusname\" value=\"" . $value['id'] . "\"checked>" . $value['status'];
+			} else {
+				echo "<input type=\"radio\" id=\"category\" name=\"statusname\" value=\"" . $value['id'] . "\">" . $value['status'];
+				
+			}		
+		}
+	echo "</div>";
+	echo "<input class=\"regbtn\" type=\"submit\" name=\"statusupdate\" value=\"Изменить\">";
+}
+
+function user_status_update() {
+	$id = $_GET['status'];
+	$statusId = $_POST['statusname'];
+
+	if ($_SESSION['userid'] == $id) {
+		$errorMsg = 'Нельзя менять статус текущего пользователя';
+		return $errorMsg;
+	}
+
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "UPDATE users SET status_id=$statusId WHERE id=$id";
+	$resultStatus = mysqli_query($link, $query) or die (mysqli_error($link));
+
+	header('Location: /admin/users.php');
 }

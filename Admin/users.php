@@ -1,5 +1,11 @@
 <?php
 require_once '../functions/functions.php';
+if (!empty ($_GET['del'])) {
+  $errorMsg = user_del();
+}
+if (!empty ($_GET['ban'])) {
+  $errorMsg = user_ban();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,6 +25,10 @@ require_once '../functions/functions.php';
         require_once "inc/leftmenu.php";
       ?>
        <div class="content">
+        <div class="errormsgblog">
+         <span><?=$errorMsg?></span>
+        </div>
+        <br>
           <h1 id='stat'>Список пользователей:</h1>
           <table class="adminblogs" border="1" cellpadding="5" cellspacing="0">
             <tr>

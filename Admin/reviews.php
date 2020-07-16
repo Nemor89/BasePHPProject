@@ -1,5 +1,8 @@
 <?php
 require_once '../functions/functions.php';
+if (!empty ($_GET['delrev'])) {
+  $errorMsg = review_del();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,6 +22,10 @@ require_once '../functions/functions.php';
         require_once "inc/leftmenu.php";
       ?>
        <div class="content">
+        <div class="errormsgblog">
+         <span><?=$errorMsg?></span>
+        </div>
+        <br>
         <h1 id='stat'>Отзывы:</h1>
           <table class="adminblogs" border="1" cellpadding="5" cellspacing="0">
             <tr>

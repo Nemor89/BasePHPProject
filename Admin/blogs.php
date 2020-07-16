@@ -1,5 +1,8 @@
 <?php
 require_once '../functions/functions.php';
+if (!empty ($_GET['del'])) {
+  $errorMsg = blog_del();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,6 +22,10 @@ require_once '../functions/functions.php';
         require_once "inc/leftmenu.php";
       ?>
        <div class="content">
+        <div class="errormsgblog">
+         <span><?=$errorMsg?></span>
+        </div>
+        <br>
         <div class="blogaddbtn">
           <a id="blogadd" href="blogadd.php">Добавить блог</a>
         </div>
@@ -28,6 +35,7 @@ require_once '../functions/functions.php';
               <th>Дата</th>
               <th>Автор</th>
               <th>Описание</th>
+              <th>Категории</th>
               <th>Редактировать</th>
               <th>Удалить</th>
             </tr>
