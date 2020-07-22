@@ -42,9 +42,9 @@ if (!empty ($_POST['blogadd'])) {
             ?>
           </div>
           <p class="categoryp">Введите описание блога:</p>
-          <textarea class="blogadddesc" name="blogdesc"></textarea>
+          <textarea class="blogadddesc" name="blogdesc"><?=$_POST['blogdesc']?></textarea>
           <p class="categoryp">Введите текст блога:</p>
-          <textarea class="blogaddtext" name="blogtext"></textarea>
+          <textarea class="blogaddtext" name="blogtext"><?=$_POST['blogtext']?></textarea>
           <div class="example-2">
             <label for="custom-file-upload" class="filupp"><span class="filupp-file-name js-value">Загрузить картинку</span>
               <input type="file" class="avatar" name="attachment-file" value="1" id="custom-file-upload" accept="image/jpeg,image/png">

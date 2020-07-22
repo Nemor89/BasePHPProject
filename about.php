@@ -24,8 +24,7 @@ require_once 'functions/functions.php';
         <p class="about2">1. Верстка шаблона,</p>
         <p class="about2">2. Реализация проекта на чистом PHP,</p>
         <p class="about2">3. Переработка проекта с использованием ООП,</p>
-        <p class="about2">4. Переработка проекта с использованием компонентов,</p>
-        <p class="about2">5. Переработка проекта с использованием framework.</p>
+        <p class="about2">4. Переработка проекта с использованием framework.</p>
       </div>
         <div class="progressbar">
           <div class="card">
@@ -36,7 +35,7 @@ require_once 'functions/functions.php';
                   <circle cx="70" cy="70" r="70"></circle>
                 </svg>
                 <div class="number">
-                  <h2>10<span>%</span></h2>
+                  <h2>40<span>%</span></h2>
                 </div>
               </div>
                 <h2 class="progress">Прогресс</h2>  

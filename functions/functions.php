@@ -333,8 +333,8 @@ function my_upload() {
 
 function blog_add() {
 
-	if (mb_strlen($_POST['blogdesc']) < 15 || mb_strlen($_POST['blogdesc']) > 126) {
-		$errorMsg = 'Описание должено быть длиной от 15 до 126 символов';
+	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 126) {
+		$errorMsg = 'Описание должено быть длиной от 10 до 126 символов';
 		return $errorMsg; 
 	} elseif (empty($_POST['category'])) {
 		$errorMsg = 'Укажите хотя бы одну категорию';
@@ -348,9 +348,9 @@ function blog_add() {
 	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
 		$errorMsg = my_upload();
 		return $errorMsg;
-	} elseif (empty ($_FILES['attachment-file']['tmp_name'])) {
-		$errorMsg = 'Добавьте картинку';
-		return $errorMsg;
+	// } elseif (empty ($_FILES['attachment-file']['tmp_name'])) {
+	// 	$errorMsg = 'Добавьте картинку';
+	// 	return $errorMsg;
 	} else {
 
 		$link = my_connect() or die (mysqli_error($link));
@@ -369,6 +369,9 @@ function blog_add() {
 		    $blogimg = '../img/blogimg/' . $id . '_img.' . $exp;
 			move_uploaded_file($_FILES['attachment-file']['tmp_name'], $blogimg);
 			$query = "UPDATE blogs SET picture='$blogimg' WHERE id='$id'";
+			$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		} else {
+			$query = "UPDATE blogs SET picture='../img/blogimg/stnd_blogimage.png' WHERE id='$id'";
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
 
@@ -520,127 +523,9 @@ function blog_buttons_admin() {
 	}
 }
 
-// ADMIN HOME PAGE
-function statistics() {
-	$link = my_connect() or die (mysqli_error($link));
-	$query1 = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
-	$blogs = mysqli_fetch_row($query1)[0];
-	$query2 = mysqli_query($link, "SELECT COUNT(*) FROM users");
-	$users = mysqli_fetch_row($query2)[0];
-	$query3 = mysqli_query($link, "SELECT COUNT(*) FROM comments");
-	$comments = mysqli_fetch_row($query3)[0];
-	$query4 = mysqli_query($link, "SELECT COUNT(*) FROM reviews");
-	$reviews = mysqli_fetch_row($query4)[0];
-	echo "<p id=\"count\">Всего опубликовано <span id=\"number\">$blogs</span> блогов.</p>";
-	echo "<p id=\"count\">Всего зарегистрировано <span id=\"number\">$users</span> пользователей.</p>";
-	echo "<p id=\"count\">Всего оставлено <span id=\"number\">$comments</span> комментариев.</p>";
-	echo "<p id=\"count\">Всего оставлено <span id=\"number\">$reviews</span> отзывов.</p>";
-}
-
-// ADMIN USERS
-function users_view() {
-	$link = my_connect() or die (mysqli_error($link));
-	$query = "SELECT * FROM users";
-	$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
-	
-	if (mysqli_num_rows($resultUsers) > 0) {
-
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
-			$_GET['page'] = 1;
-			$page = $_GET['page'];
-		} else {
-			$page = $_GET['page'];
-		}
-	
-		$notesOnPage = 23;
-		$from = ($page - 1) * $notesOnPage;
-		
-
-		$query = "SELECT *, users.id as user_id FROM users INNER JOIN status ON status.id=users.status_id ORDER BY user_id LIMIT $from, $notesOnPage";
-		$result = mysqli_query($link, $query) or die (mysqli_error($link));
-
-		$users = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
-
-		foreach ($users as $user) {
-			echo "<tr>";
-			echo "<td>" . $user['user_id'] . "</td>";
-            echo "<td>" . $user['username'] . "</td>";
-            echo "<td>" . $user['status'] . "</td>";
-            echo "<td><a id =\"blogtable\" href=\"?del=" . $user['user_id'] . "\"</a>Удалить</td>";
-            if ($user['banned'] == 0) {
-            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Забанить</td>";
-            } elseif ($user['banned'] == 1) {
-            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Разбанить</td>";
-            }
-            echo "<td><a id =\"blogtable\" href=\"userstatus.php?status=" . $user['user_id'] . "\"</a>Сменить статус</td>";
-            echo "</tr>";
-		}
-	}
-}
-
-// ADD REVIEWS
-function review_submit() {
-	if ($_SESSION['auth'] !== true) {
-		$errorMsg = 'Чтобы оставить отзыв необходимо авторизоваться!';
-		return $errorMsg;
-	} else {
-		$review = $_POST['review'];
-		$userID = $_SESSION['userid'];
-	
-		$link = my_connect() or die (mysqli_error($link));
-		$query = "INSERT INTO reviews SET user_id={$userID}, review='$review'";
-		$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
-
-		$errorMsg = 'Спасибо за отзыв!';
-		return $errorMsg;
-	}
-}
-
-function reviews_view() {
-	$link = my_connect() or die (mysqli_error($link));
-	$query = "SELECT * FROM reviews";
-	$resultReviews = mysqli_query($link, $query) or die (mysqli_error($link));
-	
-	if (mysqli_num_rows($resultReviews) > 0) {
-
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
-			$_GET['page'] = 1;
-			$page = $_GET['page'];
-		} else {
-			$page = $_GET['page'];
-		}
-	
-		$notesOnPage = 23;
-		$from = ($page - 1) * $notesOnPage;
-		
-
-		$query = "SELECT *, reviews.id as reviews_id FROM reviews INNER JOIN users ON reviews.user_id=users.id LIMIT $from, $notesOnPage";
-		$result = mysqli_query($link, $query) or die (mysqli_error($link));
-
-		$reviews = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
-		foreach ($reviews as $review) {
-			echo "<tr>";
-			echo "<td>" . $review['reviews_id'] ."</td>";
-            echo "<td>" . $review['username'] ."</td>";
-            echo "<td>" . $review['date'] ."</td>";
-            echo "<td><a id =\"blogtable\" href=\"reviewread.php?readrev=" . $review['reviews_id'] . "\"</a>Читать</td>";
-            echo "<td><a id =\"blogtable\" href=\"?delrev=" . $review['reviews_id'] . "\"</a>Удалить</td>";
-            echo "</tr>";
-		}
-	}
-}
-
-function review_del() {
-	$link = my_connect() or die (mysqli_error($link));
-	$query = "DELETE FROM reviews WHERE id={$_GET['delrev']}";
-	$resultBlogDel = mysqli_query($link, $query) or die (mysqli_error($link));
-	$errorMsg = 'Отзыв удален';
-	return $errorMsg;
-}
-
 function blog_edit() {
-	if (mb_strlen($_POST['blogdesc']) < 15 || mb_strlen($_POST['blogdesc']) > 126) {
-		$errorMsg = 'Описание должено быть длиной от 15 до 126 символов';
+	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 126) {
+		$errorMsg = 'Описание должено быть длиной от 10 до 126 символов';
 		return $errorMsg; 
 	} elseif (empty($_POST['category'])) {
 		$errorMsg = 'Укажите хотя бы одну категорию';
@@ -674,8 +559,10 @@ function blog_edit() {
 			move_uploaded_file($_FILES['attachment-file']['tmp_name'], $blogimg);
 			$query = "UPDATE blogs SET picture='$blogimg' WHERE id='$id'";
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		} else {
+			$query = "UPDATE blogs SET picture='../img/blogimg/stnd_blogimage.png' WHERE id='$id'";
+			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
-
 		$query = "DELETE FROM blog_cat WHERE blog_id=$id";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		foreach ($_POST['category'] as $category_id) {
@@ -743,12 +630,153 @@ function categories($id = null, $blog = null) {
 function blog_del() {
 	$id = $_GET['del'];
 	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT picture FROM blogs WHERE id=$id";
+	$resultBlogPic = mysqli_query($link, $query) or die (mysqli_error($link));
+	$result = mysqli_fetch_assoc($resultBlogPic);
+	$imagePath = $result['picture'];
 	$query = "DELETE FROM blogs WHERE id=$id";
 	$resultBlogDel = mysqli_query($link, $query) or die (mysqli_error($link));
 	$query = "DELETE FROM blog_cat WHERE blog_id=$id";
 	$resultCatDel = mysqli_query($link, $query) or die (mysqli_error($link));
+	if ($imagePath != '../img/blogimg/stnd_blogimage.png') {
+		unlink($imagePath);
+	}
 	$errorMsg = 'Блог удален';
 	return $errorMsg;
+}
+
+// ADMIN HOME PAGE
+function statistics() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query1 = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
+	$blogs = mysqli_fetch_row($query1)[0];
+	$query2 = mysqli_query($link, "SELECT COUNT(*) FROM users");
+	$users = mysqli_fetch_row($query2)[0];
+	$query3 = mysqli_query($link, "SELECT COUNT(*) FROM comments");
+	$comments = mysqli_fetch_row($query3)[0];
+	$query4 = mysqli_query($link, "SELECT COUNT(*) FROM reviews");
+	$reviews = mysqli_fetch_row($query4)[0];
+	echo "<p id=\"count\">Всего опубликовано <span id=\"number\">$blogs</span> блогов.</p>";
+	echo "<p id=\"count\">Всего зарегистрировано <span id=\"number\">$users</span> пользователей.</p>";
+	echo "<p id=\"count\">Всего оставлено <span id=\"number\">$comments</span> комментариев.</p>";
+	echo "<p id=\"count\">Всего оставлено <span id=\"number\">$reviews</span> отзывов.</p>";
+}
+
+// ADMIN USERS
+function users_view() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM users";
+	$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
+	
+	if (mysqli_num_rows($resultUsers) > 0) {
+
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			$_GET['page'] = 1;
+			$page = $_GET['page'];
+		} else {
+			$page = $_GET['page'];
+		}
+	
+		$notesOnPage = 23;
+		$from = ($page - 1) * $notesOnPage;
+		
+
+		$query = "SELECT *, users.id as user_id FROM users INNER JOIN status ON status.id=users.status_id ORDER BY user_id LIMIT $from, $notesOnPage";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		$users = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+		foreach ($users as $user) {
+			echo "<tr>";
+			echo "<td>" . $user['user_id'] . "</td>";
+            echo "<td>" . $user['username'] . "</td>";
+            echo "<td>" . $user['status'] . "</td>";
+            echo "<td><a id =\"blogtable\" href=\"?del=" . $user['user_id'] . "\"</a>Удалить</td>";
+            if ($user['banned'] == 0) {
+            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Забанить</td>";
+            } elseif ($user['banned'] == 1) {
+            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Разбанить</td>";
+            }
+            echo "<td><a id =\"blogtable\" href=\"userstatus.php?status=" . $user['user_id'] . "\"</a>Сменить статус</td>";
+            echo "</tr>";
+		}
+	}
+}
+
+// ADD REVIEWS
+function review_submit() {
+	if ($_SESSION['auth'] !== true) {
+		$errorMsg = 'Чтобы оставить отзыв необходимо авторизоваться!';
+		return $errorMsg;
+	} elseif (mb_strlen($_POST['review']) > 1000) {
+		$errorMsg = 'Отзыв не может быть длиннее 1000 символов!';
+		return $errorMsg;
+	} else {
+		$review = $_POST['review'];
+		$userID = $_SESSION['userid'];
+	
+		$link = my_connect() or die (mysqli_error($link));
+		$query = "INSERT INTO reviews SET user_id={$userID}, review='$review'";
+		$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		$errorMsg = 'Спасибо за отзыв!';
+		return $errorMsg;
+	}
+}
+
+function reviews_view() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM reviews";
+	$resultReviews = mysqli_query($link, $query) or die (mysqli_error($link));
+	
+	if (mysqli_num_rows($resultReviews) > 0) {
+
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			$_GET['page'] = 1;
+			$page = $_GET['page'];
+		} else {
+			$page = $_GET['page'];
+		}
+	
+		$notesOnPage = 23;
+		$from = ($page - 1) * $notesOnPage;
+		
+
+		$query = "SELECT *, reviews.id as reviews_id FROM reviews INNER JOIN users ON reviews.user_id=users.id ORDER BY date DESC LIMIT $from, $notesOnPage";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		$reviews = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+		foreach ($reviews as $review) {
+			echo "<tr>";
+			echo "<td>" . $review['reviews_id'] ."</td>";
+            echo "<td>" . $review['username'] ."</td>";
+            echo "<td>" . $review['date'] ."</td>";
+            echo "<td><a id =\"blogtable\" href=\"reviewread.php?readrev=" . $review['reviews_id'] . "\"</a>Читать</td>";
+            echo "<td><a id =\"blogtable\" href=\"?delrev=" . $review['reviews_id'] . "\"</a>Удалить</td>";
+            echo "</tr>";
+		}
+	}
+}
+
+function review_del() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "DELETE FROM reviews WHERE id={$_GET['delrev']}";
+	$resultReviewDel = mysqli_query($link, $query) or die (mysqli_error($link));
+	$errorMsg = 'Отзыв удален';
+	return $errorMsg;
+}
+
+function review_read($id) {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT *, users.id as user_id FROM reviews INNER JOIN users ON reviews.user_id=users.id WHERE reviews.id=$id";
+	$resultReview = mysqli_query($link, $query) or die (mysqli_error($link));
+	$reviewRead = mysqli_fetch_all($resultReview, MYSQLI_ASSOC);
+
+	foreach ($reviewRead as $key => $value) {
+		echo "<p class=\"reviewRead\">Автор: <span class=\"reviewspan\">" . $value['username'] . "</span></p>";
+		echo "<p class=\"reviewRead\"> Дата добавления: <span class=\"reviewspan\">" . $value['date'] . "</span></p>";
+		echo "<textarea class=\"reviewarea\">" . $value['review'] . "</textarea>";
+	}
 }
 
 function user_del() {
@@ -758,8 +786,16 @@ function user_del() {
 		return $errorMsg;
 	}
 	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT avatar FROM users WHERE id=$id";
+	$resultUserAva = mysqli_query($link, $query) or die (mysqli_error($link));
+	$result = mysqli_fetch_assoc($resultUserAva);
+	$AvaPath = $result['avatar'];
 	$query = "DELETE FROM users WHERE id=$id";
 	$resultBlogDel = mysqli_query($link, $query) or die (mysqli_error($link));
+	if ($AvaPath != 'img/avatars/stnd_ava.png') {
+		$path = '../' . $AvaPath;
+		unlink($path);
+	}
 	$errorMsg = 'Пользователь удален';
 	return $errorMsg;
 }

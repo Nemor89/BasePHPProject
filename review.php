@@ -27,7 +27,7 @@ if (!empty ($_POST['reviewsubmit'])) {
         </div>
         <h1 class="about">Оставьте свой отзыв о работе сайта</h1>
         <form class="review" method="post">
-        <textarea class="reviewarea" name="review"></textarea>
+        <textarea class="reviewarea" name="review"><?=$_POST['review']?></textarea>
         <input class="reviewsubmit"	type="submit" name="reviewsubmit">
         </form>
       </div>
