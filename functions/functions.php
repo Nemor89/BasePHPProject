@@ -333,8 +333,8 @@ function my_upload() {
 
 function blog_add() {
 
-	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 126) {
-		$errorMsg = 'Описание должено быть длиной от 10 до 126 символов';
+	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 512) {
+		$errorMsg = 'Описание должено быть длиной от 10 до 512 символов';
 		return $errorMsg; 
 	} elseif (empty($_POST['category'])) {
 		$errorMsg = 'Укажите хотя бы одну категорию';
@@ -348,15 +348,12 @@ function blog_add() {
 	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
 		$errorMsg = my_upload();
 		return $errorMsg;
-	// } elseif (empty ($_FILES['attachment-file']['tmp_name'])) {
-	// 	$errorMsg = 'Добавьте картинку';
-	// 	return $errorMsg;
 	} else {
 
 		$link = my_connect() or die (mysqli_error($link));
 
-		$description = trim(mysqli_real_escape_string($link, $_POST['blogdesc']));
-		$text = trim(mysqli_real_escape_string($link, $_POST['blogtext']));
+		$description = $_POST['blogdesc'];
+		$text = $_POST['blogtext'];
 		$author = trim(mysqli_real_escape_string($link, $_SESSION['username']));
 		
 		$query = "INSERT INTO blogs (description, text, author) VALUES ('$description', '$text', '$author')";
@@ -412,7 +409,7 @@ function blog_view() {
 	        echo "<div class=\"blog{$i}\" id=\"blog{$i}\">";
 	        echo "<p class=\"blogtext\">Дата добавления: " . $blog['date'] . "</p>";
 	        echo "<p class=\"blogtext\">Автор: " . $blog['author'] . "</p>";
-	        echo "<a href=\"#\"><img class=\"blogimg\" src=\"" . $blog['picture']. "\"></a>";
+	        echo "<a href=\"article.php?id=" . $blog['id'] . "\"><img class=\"blogimg\" src=\"" . $blog['picture']. "\"></a>";
 	        echo "<p class=\"description\">" . $blog['description'] . "</p>";
 	        echo "</div>";
 	        $i++;
@@ -524,8 +521,8 @@ function blog_buttons_admin() {
 }
 
 function blog_edit() {
-	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 126) {
-		$errorMsg = 'Описание должено быть длиной от 10 до 126 символов';
+	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 512) {
+		$errorMsg = 'Описание должено быть длиной от 10 до 512 символов';
 		return $errorMsg; 
 	} elseif (empty($_POST['category'])) {
 		$errorMsg = 'Укажите хотя бы одну категорию';
@@ -543,8 +540,8 @@ function blog_edit() {
 
 		$link = my_connect() or die (mysqli_error($link));
 
-		$description = trim(mysqli_real_escape_string($link, $_POST['blogdesc']));
-		$text = trim(mysqli_real_escape_string($link, $_POST['blogtext']));
+		$description = $_POST['blogdesc'];
+		$text = $_POST['blogtext'];
 		$author = trim(mysqli_real_escape_string($link, $_SESSION['username']));
 		
 		$id = $_GET['edit'];
@@ -662,47 +659,6 @@ function statistics() {
 	echo "<p id=\"count\">Всего оставлено <span id=\"number\">$reviews</span> отзывов.</p>";
 }
 
-// ADMIN USERS
-function users_view() {
-	$link = my_connect() or die (mysqli_error($link));
-	$query = "SELECT * FROM users";
-	$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
-	
-	if (mysqli_num_rows($resultUsers) > 0) {
-
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
-			$_GET['page'] = 1;
-			$page = $_GET['page'];
-		} else {
-			$page = $_GET['page'];
-		}
-	
-		$notesOnPage = 23;
-		$from = ($page - 1) * $notesOnPage;
-		
-
-		$query = "SELECT *, users.id as user_id FROM users INNER JOIN status ON status.id=users.status_id ORDER BY user_id LIMIT $from, $notesOnPage";
-		$result = mysqli_query($link, $query) or die (mysqli_error($link));
-
-		$users = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
-
-		foreach ($users as $user) {
-			echo "<tr>";
-			echo "<td>" . $user['user_id'] . "</td>";
-            echo "<td>" . $user['username'] . "</td>";
-            echo "<td>" . $user['status'] . "</td>";
-            echo "<td><a id =\"blogtable\" href=\"?del=" . $user['user_id'] . "\"</a>Удалить</td>";
-            if ($user['banned'] == 0) {
-            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Забанить</td>";
-            } elseif ($user['banned'] == 1) {
-            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Разбанить</td>";
-            }
-            echo "<td><a id =\"blogtable\" href=\"userstatus.php?status=" . $user['user_id'] . "\"</a>Сменить статус</td>";
-            echo "</tr>";
-		}
-	}
-}
-
 // ADD REVIEWS
 function review_submit() {
 	if ($_SESSION['auth'] !== true) {
@@ -776,6 +732,47 @@ function review_read($id) {
 		echo "<p class=\"reviewRead\">Автор: <span class=\"reviewspan\">" . $value['username'] . "</span></p>";
 		echo "<p class=\"reviewRead\"> Дата добавления: <span class=\"reviewspan\">" . $value['date'] . "</span></p>";
 		echo "<textarea class=\"reviewarea\">" . $value['review'] . "</textarea>";
+	}
+}
+
+// ADMIN USERS
+function users_view() {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM users";
+	$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
+	
+	if (mysqli_num_rows($resultUsers) > 0) {
+
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			$_GET['page'] = 1;
+			$page = $_GET['page'];
+		} else {
+			$page = $_GET['page'];
+		}
+	
+		$notesOnPage = 23;
+		$from = ($page - 1) * $notesOnPage;
+		
+
+		$query = "SELECT *, users.id as user_id FROM users INNER JOIN status ON status.id=users.status_id ORDER BY user_id LIMIT $from, $notesOnPage";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+
+		$users = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+		foreach ($users as $user) {
+			echo "<tr>";
+			echo "<td>" . $user['user_id'] . "</td>";
+            echo "<td>" . $user['username'] . "</td>";
+            echo "<td>" . $user['status'] . "</td>";
+            echo "<td><a id =\"blogtable\" href=\"?del=" . $user['user_id'] . "\"</a>Удалить</td>";
+            if ($user['banned'] == 0) {
+            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Забанить</td>";
+            } elseif ($user['banned'] == 1) {
+            	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Разбанить</td>";
+            }
+            echo "<td><a id =\"blogtable\" href=\"userstatus.php?status=" . $user['user_id'] . "\"</a>Сменить статус</td>";
+            echo "</tr>";
+		}
 	}
 }
 
@@ -862,4 +859,56 @@ function user_status_update() {
 	$resultStatus = mysqli_query($link, $query) or die (mysqli_error($link));
 
 	header('Location: /admin/users.php');
+}
+
+function article_view($id) {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM blogs WHERE id=$id";
+	$resultArt = mysqli_query($link, $query) or die (mysqli_error($link));
+	$article = mysqli_fetch_all($resultArt, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+	$query = "SELECT name FROM blog_cat INNER JOIN categories on category_id=categories.id WHERE blog_id=$id";
+	$resultCat = mysqli_query($link, $query) or die (mysqli_error($link));
+	$categories = mysqli_fetch_all($resultCat, MYSQLI_ASSOC) or die (mysqli_error($link));
+
+	echo "<p class='art'><span class='art_span'>Автор: </span>" . $article[0]['author'] . "</p>";
+	echo "<p class='art'><span class='art_span'>Дата создания: </span>" . $article[0]['date'] . "</p>";
+	foreach ($categories as $key => $value) {
+		foreach ($value as $key => $category) {
+			$categ .= $category . '; ';
+		}
+	}
+	$cat = rtrim($categ, ";	 ");
+	echo "<p class='art'><span class='art_span'>Категории: </span>" . $cat . "</p>";
+	echo "<p class='art'><span class='art_span'>Описание: </span>" . $article[0]['description'] . "</p>";
+	echo "<img class='art_img' src=\"" . $article[0]['picture'] . "\">";
+	echo "<hr color='#EE0C44'>";
+	echo "<pre class='art_pre'>" . $article[0]['text'] . "</pre>";
+	echo "<hr color='#EE0C44'>";
+}
+
+function comment_add() {
+	$comment = trim($_POST['comment']);
+	$blog_id = $_GET['id'];
+	$author = $_SESSION['username'];
+
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "INSERT INTO comments (author, comment) VALUES ('$author', '$comment')";
+	$resultComment = mysqli_query($link, $query) or die (mysqli_error($link));
+	$comment_id = mysqli_insert_id($link);
+
+	$query = "INSERT INTO comments_blogs (blog_id, comment_id) VALUES ($blog_id, $comment_id)";
+	$resultCommentBlog = mysqli_query($link, $query) or die (mysqli_error($link));
+}
+
+function comments_view() {
+	$blog_id = $_GET['id'];
+
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "SELECT * FROM comments_blogs WHERE blog_id=$blog_id";
+	$resultComments = mysqli_query($link, $query);
+	
+	if (mysqli_num_rows($resultComments) > 0) {
+		
+	}
 }

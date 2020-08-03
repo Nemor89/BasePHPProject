@@ -68,12 +68,13 @@ html::-webkit-scrollbar{
     background-color: #181E23;
 }
 
-.reviewarea::-webkit-scrollbar {
+.reviewarea::-webkit-scrollbar, .commentarea::-webkit-scrollbar, .blogadddesc::-webkit-scrollbar, .blogaddtext::-webkit-scrollbar {
     width: 10px;
     background-color: #0B0D10;
 }
 
-html::-webkit-scrollbar-thumb, #leftblock::-webkit-scrollbar-thumb, .reviewarea::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb, #leftblock::-webkit-scrollbar-thumb, .reviewarea::-webkit-scrollbar-thumb, .commentarea::-webkit-scrollbar-thumb, 
+.blogadddesc::-webkit-scrollbar-thumb, .blogaddtext::-webkit-scrollbar-thumb {
    background: linear-gradient(315deg,#ff0057,#e64a19);
    border-radius: 10px;
 }
@@ -169,6 +170,12 @@ figure {
 	overflow-x:hidden;
 	position: relative;
 	height: 1100px;
+}
+
+.maincontent-art {
+	overflow-x:hidden;
+	position: relative;
+	min-height: 1100px;
 }
 
 .leftmenue { /*ЛЕВОЕ МЕНЮ*/
@@ -1044,4 +1051,47 @@ p#count {
 	font-weight: 600;
 	color: white;
 	margin-bottom: 80px;
+}
+
+/*СТАТЬЯ*/
+
+.art {
+	font-size: 20px;
+	font-weight: 500;
+	color: white;
+	padding: 10px;
+}
+
+.art_span {
+	color: #EE0C44;
+}
+
+.art_img {
+	max-width: 1100px;
+}
+
+.art_pre {
+	font-size: 18px;
+	font-weight: 300;
+	color: white;
+	white-space: pre-wrap;
+}
+
+.commentarea {
+	margin-top: 20px;
+	border: none;
+	background-color: #0B0D10;
+	font-size: 18px;
+	color: white;
+	text-shadow: 1px 1px 1px rgba(0,0,0,.5);
+	width: 99%;
+	height: 160px;
+	resize: none;
+}
+
+.attention {
+	text-align: center;
+	font-size: 26px;
+	font-weight: 600;
+	color: #EE0C44;
 }
