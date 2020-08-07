@@ -29,8 +29,9 @@ if (!empty ($_POST['comment'] && !empty ($_POST['commentsubmit']))) {
         }
           if ($_SESSION['auth']) {
         ?>
+          <p class="attention">Оставьте комментарий</p>
           <form method="POST">
-          <textarea class="commentarea" name="comment"><?=$_POST['comment']?></textarea>
+          <textarea class="commentarea" name="comment"></textarea>
           <input class="reviewsubmit" type="submit" name="commentsubmit">
           </form>
         <?php

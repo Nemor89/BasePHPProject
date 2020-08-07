@@ -884,7 +884,7 @@ function article_view($id) {
 	echo "<img class='art_img' src=\"" . $article[0]['picture'] . "\">";
 	echo "<hr color='#EE0C44'>";
 	echo "<pre class='art_pre'>" . $article[0]['text'] . "</pre>";
-	echo "<hr color='#EE0C44'>";
+	echo "<hr color='#EE0C44'><br>";
 }
 
 function comment_add() {
@@ -906,9 +906,24 @@ function comments_view() {
 
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM comments_blogs WHERE blog_id=$blog_id";
-	$resultComments = mysqli_query($link, $query);
+	$resultComments = mysqli_query($link, $query) or die (mysqli_error($link));
 	
 	if (mysqli_num_rows($resultComments) > 0) {
-		
+		$query = "SELECT comments.id, comments.author, comments.date, comment, avatar FROM users RIGHT JOIN comments ON users.username=comments.author INNER JOIN comments_blogs ON comments.id=comments_blogs.comment_id INNER JOIN blogs ON comments_blogs.blog_id=blogs.id WHERE blogs.id=$blog_id ORDER BY date DESC";
+		$result = mysqli_query($link, $query) or die (mysqli_error($link));
+		$comment = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
+		foreach ($comment as $key => $value) {
+				echo "<div class=\"comment\">";
+				echo "<div class=\"imgauthor\">";
+				echo "<img class=\"commentimg\" src=\"" . $value['avatar'] . "\">";
+				echo "<span class=\"commentauthor\">" . $value['author'] . "</span><br>";
+				echo "<span class=\"commentauthor\">" . $value['date'] . "</span><br>";
+				if ($_SESSION['status'] == 3) {
+					echo "<a href=\"admin/commentdel.php?=" . $value['id'] . "\" name=\"commentdel\" id=\"commentdel\">Удалить</a>";
+				}
+				echo "</div>";
+				echo "<div class=\"commentspan\"><pre>" . $value['comment'] . "</pre></div>";
+				echo "</div>";
+		}
 	}
 }

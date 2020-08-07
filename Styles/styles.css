@@ -1091,7 +1091,52 @@ p#count {
 
 .attention {
 	text-align: center;
-	font-size: 26px;
+	font-size: 20px;
 	font-weight: 600;
 	color: #EE0C44;
+}
+
+.comment {
+	border-top: 1px solid #EE0C44;
+	border-bottom: 1px solid #EE0C44;
+	display: flex;
+	height: auto;
+}
+
+.commentimg {
+	margin: 10px;
+	width: 100px;
+	height: 100px;
+}
+
+.commentspan {
+	text-align: left;
+	margin-left: 10px;
+	font-size: 16px;
+	color: white;
+}
+
+.commentauthor {
+	width: 100px;
+	position: relative;
+	display: block;
+	margin-left: 10px;
+	font-size: 18px;
+	color: #650AF2;
+}
+
+.imgauthor {
+	position: relative;
+	border-right: 1px solid #EE0C44;
+	width: 120px;
+}
+
+a#commentdel {
+	width: 100px;
+	position: relative;
+	display: block;
+	margin-left: 10px;
+	font-size: 18px;
+	color: #EE0C44;
+	text-decoration: none;
 }
