@@ -400,7 +400,7 @@ function blog_view() {
 		$notesOnPage = 4;
 		$from = ($page - 1) * $notesOnPage;
 		
-		$query = "SELECT * FROM blogs LIMIT $from, $notesOnPage";
+		$query = "SELECT * FROM blogs ORDER BY date DESC LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
 	
@@ -413,6 +413,9 @@ function blog_view() {
 	        echo "<p class=\"description\">" . $blog['description'] . "</p>";
 	        echo "</div>";
 	        $i++;
+		}
+		if (mysqli_num_rows($resultblogs) > 4) {
+			blog_buttons();
 		}
 	}
 }
@@ -488,6 +491,7 @@ function blog_view_admin() {
 }
 
 function blog_buttons_admin() {
+	$articleID = $_GET['id'];
 	$uri = explode('?', $_SERVER['REQUEST_URI']);
 
 	$link = my_connect() or die (mysqli_error($link));
@@ -497,25 +501,41 @@ function blog_buttons_admin() {
 		$query = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
 	} elseif ($uri[0] == '/admin/reviews.php') {
 		$query = mysqli_query($link, "SELECT COUNT(*) FROM reviews");
+	} elseif ($uri[0] == '/article.php') {
+		$query = mysqli_query($link, "SELECT COUNT(*) FROM comments");
 	}
+
 	$rows = mysqli_fetch_row($query)[0];
 
-	if(empty($_GET['page']) or $_GET['page'] <= 1) {
-		echo "<a id =\"prev_admin\" href=\"?page=" . $_GET['page'] . "\">Сюда</a>";
-	} else {
-		echo "<a id =\"prev_admin\" href=\"?page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
-	}
-	if ($uri[0] == '/admin/blogs.php') {
-		if ($_GET['page'] < ceil($rows / 6)) {
-			echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+	if ($uri[0] == '/article.php') {
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			echo "<a id =\"prev_admin\" href=\"?id=" . $articleID . "&page=" . $_GET['page'] . "\">Сюда</a>";
 		} else {
-			echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
+			echo "<a id =\"prev_admin\" href=\"?id=" . $articleID . "&page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
+		}
+		if ($_GET['page'] < ceil($rows / 10)) {
+			echo "<a id =\"next_admin\" href=\"?id=" . $articleID . "&page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+		} else {
+			echo "<a id =\"next_admin\" href=\"?id=" . $articleID . "&page=" . $_GET['page'] . "\">Туда</a>";
 		}
 	} else {
-		if ($_GET['page'] < ceil($rows / 23)) {
-			echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+			echo "<a id =\"prev_admin\" href=\"?page=" . $_GET['page'] . "\">Сюда</a>";
 		} else {
-			echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
+			echo "<a id =\"prev_admin\" href=\"?page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
+		}
+		if ($uri[0] == '/admin/blogs.php') {
+			if ($_GET['page'] < ceil($rows / 6)) {
+				echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+			} else {
+				echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
+			}
+		} else {
+			if ($_GET['page'] < ceil($rows / 23)) {
+				echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
+			} else {
+				echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
+			}
 		}
 	}
 }
@@ -907,9 +927,18 @@ function comments_view() {
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM comments_blogs WHERE blog_id=$blog_id";
 	$resultComments = mysqli_query($link, $query) or die (mysqli_error($link));
-	
+
+	if(empty($_GET['page']) or $_GET['page'] <= 1) {
+		$_GET['page'] = 1;
+		$page = $_GET['page'];
+	} else {
+		$page = $_GET['page'];
+	}
+	$notesOnPage = 10;
+	$from = ($page - 1) * $notesOnPage;
+
 	if (mysqli_num_rows($resultComments) > 0) {
-		$query = "SELECT comments.id, comments.author, comments.date, comment, avatar FROM users RIGHT JOIN comments ON users.username=comments.author INNER JOIN comments_blogs ON comments.id=comments_blogs.comment_id INNER JOIN blogs ON comments_blogs.blog_id=blogs.id WHERE blogs.id=$blog_id ORDER BY date DESC";
+		$query = "SELECT comments.id, comments.author, comments.date, comment, avatar FROM users RIGHT JOIN comments ON users.username=comments.author INNER JOIN comments_blogs ON comments.id=comments_blogs.comment_id INNER JOIN blogs ON comments_blogs.blog_id=blogs.id WHERE blogs.id=$blog_id ORDER BY date DESC LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		$comment = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
 		foreach ($comment as $key => $value) {
@@ -919,11 +948,23 @@ function comments_view() {
 				echo "<span class=\"commentauthor\">" . $value['author'] . "</span><br>";
 				echo "<span class=\"commentauthor\">" . $value['date'] . "</span><br>";
 				if ($_SESSION['status'] == 3) {
-					echo "<a href=\"admin/commentdel.php?=" . $value['id'] . "\" name=\"commentdel\" id=\"commentdel\">Удалить</a>";
+					echo "<a href=\"admin/commentdel.php?comdel=" . $value['id'] . "\" name=\"commentdel\" id=\"commentdel\">Удалить</a>";
 				}
 				echo "</div>";
 				echo "<div class=\"commentspan\"><pre>" . $value['comment'] . "</pre></div>";
 				echo "</div>";
 		}
+		if (mysqli_num_rows($resultComments) > 10) {
+			blog_buttons_admin();
+		}
 	}
+}
+
+function comment_del($id) {
+	$link = my_connect() or die (mysqli_error($link));
+	$query = "DELETE FROM comments WHERE id=$id";
+	$result = mysqli_query($link, $query) or die (mysqli_error($link));
+	$query = "DELETE FROM comments_blogs WHERE comment_id=$id";
+	$result = mysqli_query($link, $query) or die (mysqli_error($link));
+	header('Location: ' . $_SERVER["HTTP_REFERER"]);
 }

@@ -29,7 +29,8 @@ if (!empty ($_POST['comment'] && !empty ($_POST['commentsubmit']))) {
         }
           if ($_SESSION['auth']) {
         ?>
-          <p class="attention">Оставьте комментарий</p>
+          <br><br><br><br><br><br><br>
+          <p class="attention">Оставьте комментарий!</p>
           <form method="POST">
           <textarea class="commentarea" name="comment"></textarea>
           <input class="reviewsubmit" type="submit" name="commentsubmit">
@@ -37,7 +38,8 @@ if (!empty ($_POST['comment'] && !empty ($_POST['commentsubmit']))) {
         <?php
           } else {
         ?>
-          <p class="attention">Авторизуйтесь, чтобы оставить комментарий</p>
+          <br><br><br><br><br><br><br>
+          <p class="attention">Авторизуйтесь, чтобы оставить комментарий!</p>
         <?php
           }
         ?>

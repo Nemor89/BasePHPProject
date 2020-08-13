@@ -21,7 +21,6 @@ require_once 'functions/functions.php';
       <div class="blogs">
           <?php
           blog_view();
-          blog_buttons();
           ?>
       </div>
      </div>
