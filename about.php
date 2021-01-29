@@ -2,10 +2,10 @@
 require_once 'functions/functions.php';
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="ru">
  <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" type="text/css" href="styles/styles.css">
+  <link rel="stylesheet" type="text/css" href="Styles/styles.css">
   <title>О сайте</title>
  </head>
  <body>

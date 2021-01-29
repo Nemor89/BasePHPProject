@@ -1,9 +1,10 @@
 <?php
-session_start();
+session_start ();
 
 // SQL
 
-function my_connect() {
+function my_connect ()
+{
 	$SQLhost = 'localhost';
 	$SQLuser = 'root';
 	$SQLpassword = '';
@@ -14,10 +15,14 @@ function my_connect() {
 
 // HEADER
 
-function visitor_name() {
-	if (empty ($_SESSION['username'])) {
+function visitor_name ()
+{
+	if (empty ($_SESSION['username']))
+	{
 		$name = "Гость!";
-	} else {
+	}
+	else
+	{
 		$name = $_SESSION['username'] . '!';
 	}
 
@@ -32,7 +37,8 @@ function visitor_name() {
 	}
 }
 
-function my_daytime() {
+function my_daytime ()
+{
 	setlocale(LC_ALL, 'russian');
 	$mon = strftime('%B');
 	$mon = iconv('windows-1251', 'utf-8', $mon);
@@ -42,15 +48,18 @@ function my_daytime() {
 	return "Сегодня $day, " . date('d.m.Y') . " года";
 }
 
-function avatar_view() {
-	if ($_SESSION['auth']) {
+function avatar_view ()
+{
+	if ($_SESSION['auth'])
+	{
 		$username = $_SESSION["username"];
 		$link = my_connect() or die (mysqli_error($link));
 		$query = "SELECT * FROM users WHERE username='$username'";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		$user = mysqli_fetch_assoc($result) or die (mysqli_error($link));
 
-		if (isset($user["avatar"])) {
+		if (isset($user["avatar"]))
+		{
 			$result = '<figure>';
 			$result .= '<img class="avatar" src="' . $user["avatar"] . '">';
 			$result .= '</figure>';
@@ -62,8 +71,10 @@ function avatar_view() {
 
 //MENU
 
-function header_menu() {
-	if (empty ($_SESSION['auth'])) {
+function header_menu ()
+{
+	if (empty ($_SESSION['auth']))
+	{
 		$headerMenu = [
 			'Регистрация' => 'registr.php',
 			'Войти' => 'login.php'
@@ -71,12 +82,15 @@ function header_menu() {
 
 		$result = '';
 
-		foreach ($headerMenu as $name => $href) {
+		foreach ($headerMenu as $name => $href)
+		{
 			$result .= "<div class=\"login\"><a id =\"top\" href =$href>$name</a></div>";
 		}
 
 		return $result;
-	} else {
+	}
+	else
+	{
 		$headerMenu = [
 			'Настройки' => '#',
 			'Выйти' => 'logout.php'
@@ -84,7 +98,8 @@ function header_menu() {
 
 		$result = '';
 
-		foreach ($headerMenu as $name => $href) {
+		foreach ($headerMenu as $name => $href)
+		{
 			$result .= "<div class=\"login\"><a id =\"top\" href =$href>$name</a></div>";
 		}
 
@@ -92,7 +107,8 @@ function header_menu() {
 	}
 }
 
-function left_menu() {
+function left_menu ()
+{
 	$leftMenu = [
 		'Главная' => 'index.php',
 		'Новое' => '#',
@@ -104,14 +120,16 @@ function left_menu() {
 
 	$result = '';
 
-	foreach ($leftMenu as $name => $href) {
+	foreach ($leftMenu as $name => $href)
+	{
 		$result .= "<li class=\"left\"><a id =\"left\" href = $href>$name</a></li>";
 	}
 
 	return $result;
 }
 
-function bottom_menu() {
+function bottom_menu ()
+{
 	$bottomMenu = [
 		'О сайте' => 'about.php',
 		'Контакты' => '#',
@@ -120,7 +138,8 @@ function bottom_menu() {
 
 	$result = '';
 
-	foreach ($bottomMenu as $name => $href) {
+	foreach ($bottomMenu as $name => $href)
+	{
 		$result .= "<div class=\"botbuttons\"><a id =\"bot\" href=$href>$name</a></div>";
 	}
 
@@ -129,8 +148,10 @@ function bottom_menu() {
 
 //ADMIN MENU
 
-function admin_header_menu() {
-	if (empty ($_SESSION['auth'])) {
+function admin_header_menu ()
+{
+	if (empty ($_SESSION['auth']))
+	{
 		$headerMenu = [
 			'Регистрация' => '../registr.php',
 			'Войти' => '../login.php'
@@ -138,12 +159,15 @@ function admin_header_menu() {
 
 		$result = '';
 
-		foreach ($headerMenu as $name => $href) {
+		foreach ($headerMenu as $name => $href)
+		{
 			$result .= "<div class=\"login\"><a id =\"top\" href =\"$href\">$name</a></div>";
 		}
 
 		return $result;
-	} else {
+	}
+	else
+	{
 		$headerMenu = [
 			'Настройки' => '#',
 			'Выйти' => '../logout.php'
@@ -151,7 +175,8 @@ function admin_header_menu() {
 
 		$result = '';
 
-		foreach ($headerMenu as $name => $href) {
+		foreach ($headerMenu as $name => $href)
+		{
 			$result .= "<div class=\"login\"><a id =\"top\" href =$href>$name</a></div>";
 		}
 
@@ -159,7 +184,8 @@ function admin_header_menu() {
 	}
 }
 
-function admin_left_menu() {
+function admin_left_menu ()
+{
 	$leftMenu = [
 		'Главная' => '../index.php',
 		'Админка' => 'index.php',
@@ -171,14 +197,16 @@ function admin_left_menu() {
 
 	$result = '';
 
-	foreach ($leftMenu as $name => $href) {
+	foreach ($leftMenu as $name => $href)
+	{
 		$result .= "<li class=\"left\"><a id =\"left\" href = $href>$name</a></li>";
 	}
 
 	return $result;
 }
 
-function admin_bottom_menu() {
+function admin_bottom_menu()
+{
 	$bottomMenu = [
 		'О сайте' => '../about.php',
 		'Контакты' => '#',
@@ -187,7 +215,8 @@ function admin_bottom_menu() {
 
 	$result = '';
 
-	foreach ($bottomMenu as $name => $href) {
+	foreach ($bottomMenu as $name => $href)
+	{
 		$result .= "<div class=\"botbuttons\"><a id =\"bot\" href=$href>$name</a></div>";
 	}
 
@@ -196,7 +225,8 @@ function admin_bottom_menu() {
 
 //REGISTRATION
 
-function registr() {
+function registr ()
+{
 	
 	$link = my_connect() or die (mysqli_error($link));
 
@@ -210,28 +240,43 @@ function registr() {
 	$query = "SELECT * FROM users WHERE useremail='$email'";
 	$resultEmail = mysqli_query($link, $query);
 
-	if (!preg_match('#([A-Za-z0-9-]+){5,15}#', $_POST['login'])) {
+	if (!preg_match('#([A-Za-z0-9-]+){5,15}#', $_POST['login']))
+	{
 		$errorMsg = 'Логин должен быть длиной от 5 до 15 символов и состоять из букв латинского алфавита, или цифр';
 		return $errorMsg; 
-	} elseif (mysqli_num_rows($resultlogin) > 0) {
+	}
+	elseif (mysqli_num_rows($resultlogin) > 0)
+    {
 		$errorMsg = 'Пользователь с таким логином уже существует';
 		return $errorMsg;
-	} elseif (!preg_match('#([A-Za-z0-9-\*!\.\?_]+){5,15}#', $_POST['password'])) {
+	}
+	elseif (!preg_match('#([A-Za-z0-9-\*!\.\?_]+){5,15}#', $_POST['password']))
+    {
 		$errorMsg = 'Пароль должен быть длиной от 5 до 15 символов  и состоять из букв латинского алфавита, цифр или спецсимволов';
 		return $errorMsg;
-	} elseif ($_POST['password'] != $_POST['confirm']) {
+	}
+	elseif ($_POST['password'] != $_POST['confirm'])
+    {
 		$errorMsg = 'Пароли не совпадают';
 		return $errorMsg;
-	} elseif (!empty($_POST['email']) && !preg_match('#^([A-Za-z0-9_\.-])+?@([A-Za-z0-9_\.-])+?\.([A-Za-z\.]{2,6})$#', $_POST['email'])) {
+	}
+	elseif (!empty($_POST['email']) && !preg_match('#^([A-Za-z0-9_\.-])+?@([A-Za-z0-9_\.-])+?\.([A-Za-z\.]{2,6})$#', $_POST['email']))
+    {
 		$errorMsg = 'Некорректный email';
 		return $errorMsg;
-	} elseif (!empty($_POST['email']) && mysqli_num_rows($resultEmail) > 0) {
+	}
+	elseif (!empty($_POST['email']) && mysqli_num_rows($resultEmail) > 0)
+    {
 		$errorMsg = 'Такой email уже используется';
 		return $errorMsg;
-	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
+	}
+	elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK'))
+    {
 		$errorMsg = my_upload();
 		return $errorMsg;
-	} else {
+	}
+	else
+	{
 	
 	$query = "INSERT INTO users (username, useremail, password) VALUES ('$login', '$email', '$password')";
 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
@@ -240,32 +285,36 @@ function registr() {
 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
 	$user = mysqli_fetch_assoc($result) or die (mysqli_error($link));
 
-	if (!empty ($_FILES['attachment-file']['tmp_name'])) {
+	if (!empty ($_FILES['attachment-file']['tmp_name']))
+	{
 		$pathInfo = pathinfo($_FILES['attachment-file']['name']);
 	    $exp = $pathInfo['extension'];
 	    $avatar = 'img/avatars/' . $user['id'] . '_ava.' . $exp;
 		move_uploaded_file($_FILES['attachment-file']['tmp_name'], $avatar);
 		$query = "UPDATE users SET avatar='$avatar' WHERE id='{$user['id']}'";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
-	} else {
+	}
+	else
+	{
 		$avatar = 'img/avatars/stnd_ava.png';
 		$query = "UPDATE users SET avatar='$avatar' WHERE id='{$user['id']}'";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 	}
 
-	session_start();
+	session_start ();
 	$_SESSION['auth'] = true;
 	$_SESSION['username'] = $user['username'];
 	$_SESSION['userid'] = $user['id'];
 	$_SESSION['status'] = $user['status_id'];
 
-	header('Location: index.php');
+	header ('Location: index.php');
 	}  
 }
 
 //AUTHORIZATION
 
-function authorization() {
+function authorization ()
+{
 	$login = $_POST['login'];
 
 	$link = my_connect() or die (mysqli_error($link));
@@ -273,24 +322,32 @@ function authorization() {
 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
 	$user = mysqli_fetch_assoc($result);
 
-	if (!empty($user)) {
+	if (!empty($user))
+	{
 		$hash = $user['password'];
 
-		if (password_verify($_POST['password'], $hash) && ($user['banned'] == 0)) {
+		if (password_verify($_POST['password'], $hash) && ($user['banned'] == 0))
+		{
 			session_start();
 			$_SESSION['auth'] = true;
 			$_SESSION['username'] = $user ['username'];
 			$_SESSION['userid'] = $user['id'];
 			$_SESSION['status'] = $user['status_id'];
 			header('Location: index.php');
-		} elseif (!password_verify($_POST['password'], $hash)) {
+		}
+		elseif (!password_verify($_POST['password'], $hash))
+        {
 			$errorMsg = 'Неверный логин, или пароль';
 			return $errorMsg;
-		} elseif ($user['banned'] == 1) {
+		}
+		elseif ($user['banned'] == 1)
+        {
 			$errorMsg = 'Вы забанены. Свяжитесь с администратором';
 			return $errorMsg;
 		}
-	} else {
+	}
+	else
+	{
 		$errorMsg = 'Неверный логин, или пароль';
 		return $errorMsg;
 	}
@@ -298,12 +355,15 @@ function authorization() {
 
 //FILEUPLOAD
 
-function my_upload() {
-	if (!empty ($_FILES['attachment-file']['tmp_name'])) {
+function my_upload ()
+{
+	if (!empty ($_FILES['attachment-file']['tmp_name']))
+	{
 		$filePath  = $_FILES['attachment-file']['tmp_name'];
 		$fi = finfo_open(FILEINFO_MIME_TYPE);
 		$mime = (string) finfo_file($fi, $filePath);
-		if (strpos($mime, 'image') === false) {
+		if (strpos($mime, 'image') === false)
+		{
 			$errorMsg = 'Можно загружать только изображения';
 			return $errorMsg;
 		}
@@ -311,44 +371,61 @@ function my_upload() {
 		$limitBytes  = 1024 * 1024 * 2;
 		$limitWidth  = 1280;
 		$limitHeight = 1280;
-		if (filesize($filePath) > $limitBytes) {
+		if (filesize($filePath) > $limitBytes)
+		{
 			$errorMsg = 'Размер изображения не должен превышать 2 Мбайт';
 			return $errorMsg;
 		}
-		if ($image[1] > $limitHeight) {
+		if ($image[1] > $limitHeight)
+		{
 			$errorMsg = 'Высота изображения не должна превышать 1280 точек';
 			return $errorMsg;
 		}
-		if ($image[0] > $limitWidth) {
+		if ($image[0] > $limitWidth)
+		{
 			$errorMsg = 'Ширина изображения не должна превышать 1280 точек';
 			return $errorMsg;
 		}
 		return 'OK';
-	} else {
+	}
+	else
+	{
 		return 'OK';
 	}
 }
 
 //BLOG ADD
 
-function blog_add() {
+function blog_add ()
+{
 
-	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 512) {
+	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 512)
+	{
 		$errorMsg = 'Описание должено быть длиной от 10 до 512 символов';
 		return $errorMsg; 
-	} elseif (empty($_POST['category'])) {
+	}
+	elseif (empty($_POST['category']))
+    {
 		$errorMsg = 'Укажите хотя бы одну категорию';
 		return $errorMsg;
-	} elseif (count($_POST['category']) > 5) {
+	}
+	elseif (count($_POST['category']) > 5)
+    {
 		$errorMsg = 'Укажите не более пяти категорий';
 		return $errorMsg;
-	} elseif (mb_strlen($_POST['blogtext']) < 20) {
+	}
+	elseif (mb_strlen($_POST['blogtext']) < 20)
+    {
 		$errorMsg = 'Текст должен быть длиной не менее 20 символов';
 		return $errorMsg;
-	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
+	}
+	elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK'))
+    {
 		$errorMsg = my_upload();
 		return $errorMsg;
-	} else {
+	}
+	else
+	{
 
 		$link = my_connect() or die (mysqli_error($link));
 
@@ -360,19 +437,23 @@ function blog_add() {
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		$id = mysqli_insert_id($link); // получаем последний добавленный id
 
-		if (!empty ($_FILES['attachment-file']['tmp_name'])) {
+		if (!empty ($_FILES['attachment-file']['tmp_name']))
+		{
 			$pathInfo = pathinfo($_FILES['attachment-file']['name']);
 		    $exp = $pathInfo['extension'];
 		    $blogimg = '../img/blogimg/' . $id . '_img.' . $exp;
 			move_uploaded_file($_FILES['attachment-file']['tmp_name'], $blogimg);
 			$query = "UPDATE blogs SET picture='$blogimg' WHERE id='$id'";
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
-		} else {
+		}
+		else
+		{
 			$query = "UPDATE blogs SET picture='../img/blogimg/stnd_blogimage.png' WHERE id='$id'";
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
 
-		foreach ($_POST['category'] as $category_id) {
+		foreach ($_POST['category'] as $category_id)
+		{
 			$query = "INSERT INTO blog_cat (blog_id, category_id) VALUES ('$id', '$category_id')";
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
@@ -382,18 +463,23 @@ function blog_add() {
 
 //BLOG VIEW
 
-function blog_view() {
+function blog_view ()
+{
 
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM blogs";
 	$resultblogs = mysqli_query($link, $query) or die (mysqli_error($link));
 	
-	if (mysqli_num_rows($resultblogs) > 0) {
+	if (mysqli_num_rows($resultblogs) > 0)
+	{
 
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+		if(empty($_GET['page']) or $_GET['page'] <= 1)
+		{
 			$_GET['page'] = 1;
 			$page = $_GET['page'];
-		} else {
+		}
+		else
+		{
 			$page = $_GET['page'];
 		}
 	
@@ -405,7 +491,8 @@ function blog_view() {
 		$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
 	
 		$i = 1;
-		foreach ($blogs as $blog) {
+		foreach ($blogs as $blog)
+		{
 	        echo "<div class=\"blog{$i}\" id=\"blog{$i}\">";
 	        echo "<p class=\"blogtext\">Дата добавления: " . $blog['date'] . "</p>";
 	        echo "<p class=\"blogtext\">Автор: " . $blog['author'] . "</p>";
@@ -414,42 +501,56 @@ function blog_view() {
 	        echo "</div>";
 	        $i++;
 		}
-		if (mysqli_num_rows($resultblogs) > 4) {
+		if (mysqli_num_rows($resultblogs) > 4)
+		{
 			blog_buttons();
 		}
 	}
 }
 
-function blog_buttons() {
+function blog_buttons ()
+{
 
 	$link = my_connect() or die (mysqli_error($link));
 	$query = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
 	$rows = mysqli_fetch_row($query)[0];
 
-	if(empty($_GET['page']) or $_GET['page'] <= 1) {
+	if(empty($_GET['page']) or $_GET['page'] <= 1)
+	{
 		echo "<a id =\"prev\" href=\"/?page=" . $_GET['page'] . "\">Сюда</a>";
-	} else {
+	}
+	else
+	{
 		echo "<a id =\"prev\" href=\"/?page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
 	}
-	if ($_GET['page'] < ceil($rows / 4)) {
+
+	if ($_GET['page'] < ceil($rows / 4))
+	{
 		echo "<a id =\"next\" href=\"/?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
-	} else {
+	}
+	else
+	{
 		echo "<a id =\"next\" href=\"/?page=" . $_GET['page'] . "\">Туда</a>";
 	}
 }
 
-function blog_view_admin() {
+function blog_view_admin ()
+{
 
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM blogs";
 	$resultBlogs = mysqli_query($link, $query) or die (mysqli_error($link));
 	
-	if (mysqli_num_rows($resultBlogs) > 0) {
+	if (mysqli_num_rows($resultBlogs) > 0)
+	{
 
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+		if(empty($_GET['page']) or $_GET['page'] <= 1)
+		{
 			$_GET['page'] = 1;
 			$page = $_GET['page'];
-		} else {
+		}
+		else
+		{
 			$page = $_GET['page'];
 		}
 	
@@ -457,10 +558,13 @@ function blog_view_admin() {
 		$from = ($page - 1) * $notesOnPage;
 
 		// ВЫБОРКА КАТЕГОРИЙ
-		$query = "SELECT DISTINCT blog_id, blogs.id as blogs_id, date, author, description, name FROM blogs INNER JOIN blog_cat on blogs.id=blog_cat.blog_id INNER JOIN categories on blog_cat.category_id=categories.id";
+		$query = "SELECT DISTINCT blog_id, blogs.id as blogs_id, date, author, description, name 
+                    FROM blogs INNER JOIN blog_cat on blogs.id=blog_cat.blog_id 
+                    INNER JOIN categories on blog_cat.category_id=categories.id";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		$cats = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
-		foreach ($cats as $key => $value) {
+		foreach ($cats as $key => $value)
+		{
 			$arr[] = [$value["blogs_id"] => $value['name']];
 		}
 
@@ -468,16 +572,20 @@ function blog_view_admin() {
 		$query = "SELECT * FROM blogs LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		$blogs = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
-		foreach ($blogs as $blog) {
+		foreach ($blogs as $blog)
+		{
 			echo "<tr>";
 			echo "<td>" . $blog['id'] ."</td>";
             echo "<td>" . $blog['date'] ."</td>";
             echo "<td>" . $blog['author'] ."</td>";
             echo "<td>" . $blog['description'] ."</td>";
             echo "<td>";
-            foreach ($arr as $key => $cat) {
-            	foreach ($cat as $key => $value) {
-            		if ($key == $blog['id']){
+            foreach ($arr as $key => $cat)
+            {
+            	foreach ($cat as $key => $value)
+            	{
+            		if ($key == $blog['id'])
+            		{
                    	echo $cat[$key] . '<br>';
             		}
             	}
@@ -490,73 +598,116 @@ function blog_view_admin() {
 	}
 }
 
-function blog_buttons_admin() {
+function blog_buttons_admin ()
+{
 	$articleID = $_GET['id'];
 	$uri = explode('?', $_SERVER['REQUEST_URI']);
 
 	$link = my_connect() or die (mysqli_error($link));
-	if ($uri[0] == '/admin/users.php') {
+	if ($uri[0] == '/admin/users.php')
+	{
 		$query = mysqli_query($link, "SELECT COUNT(*) FROM users");
-	} elseif ($uri[0] == '/admin/blogs.php') {
+	}
+	elseif ($uri[0] == '/admin/blogs.php')
+    {
 		$query = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
-	} elseif ($uri[0] == '/admin/reviews.php') {
+	}
+	elseif ($uri[0] == '/admin/reviews.php')
+    {
 		$query = mysqli_query($link, "SELECT COUNT(*) FROM reviews");
-	} elseif ($uri[0] == '/article.php') {
+	}
+	elseif ($uri[0] == '/article.php')
+    {
 		$query = mysqli_query($link, "SELECT COUNT(*) FROM comments");
 	}
 
 	$rows = mysqli_fetch_row($query)[0];
 
-	if ($uri[0] == '/article.php') {
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+	if ($uri[0] == '/article.php')
+	{
+		if(empty($_GET['page']) or $_GET['page'] <= 1)
+		{
 			echo "<a id =\"prev_admin\" href=\"?id=" . $articleID . "&page=" . $_GET['page'] . "\">Сюда</a>";
-		} else {
+		}
+		else
+		{
 			echo "<a id =\"prev_admin\" href=\"?id=" . $articleID . "&page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
 		}
-		if ($_GET['page'] < ceil($rows / 10)) {
+
+		if ($_GET['page'] < ceil($rows / 10))
+		{
 			echo "<a id =\"next_admin\" href=\"?id=" . $articleID . "&page=" . ($_GET['page'] + 1) . "\">Туда</a>";
-		} else {
+		}
+		else
+		{
 			echo "<a id =\"next_admin\" href=\"?id=" . $articleID . "&page=" . $_GET['page'] . "\">Туда</a>";
 		}
-	} else {
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+	}
+	else
+	{
+		if(empty($_GET['page']) or $_GET['page'] <= 1)
+		{
 			echo "<a id =\"prev_admin\" href=\"?page=" . $_GET['page'] . "\">Сюда</a>";
-		} else {
+		}
+		else
+		{
 			echo "<a id =\"prev_admin\" href=\"?page=" . ($_GET['page'] - 1) . "\">Сюда</a>";  
 		}
-		if ($uri[0] == '/admin/blogs.php') {
-			if ($_GET['page'] < ceil($rows / 6)) {
+
+		if ($uri[0] == '/admin/blogs.php')
+		{
+			if ($_GET['page'] < ceil($rows / 6))
+			{
 				echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
-			} else {
+			}
+			else
+			{
 				echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
 			}
-		} else {
-			if ($_GET['page'] < ceil($rows / 23)) {
+		}
+		else
+		{
+			if ($_GET['page'] < ceil($rows / 23))
+			{
 				echo "<a id =\"next_admin\" href=\"?page=" . ($_GET['page'] + 1) . "\">Туда</a>";
-			} else {
+			}
+			else
+			{
 				echo "<a id =\"next_admin\" href=\"?page=" . $_GET['page'] . "\">Туда</a>";
 			}
 		}
 	}
 }
 
-function blog_edit() {
-	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 512) {
+function blog_edit ()
+{
+	if (mb_strlen($_POST['blogdesc']) < 10 || mb_strlen($_POST['blogdesc']) > 512)
+	{
 		$errorMsg = 'Описание должено быть длиной от 10 до 512 символов';
 		return $errorMsg; 
-	} elseif (empty($_POST['category'])) {
+	}
+	elseif (empty($_POST['category']))
+    {
 		$errorMsg = 'Укажите хотя бы одну категорию';
 		return $errorMsg;
-	} elseif (mb_strlen($_POST['blogtext']) < 20) {
+	}
+	elseif (mb_strlen($_POST['blogtext']) < 20)
+    {
 		$errorMsg = 'Текст должен быть длиной не менее 20 символов';
 		return $errorMsg;
-	} elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK')) {
+	}
+	elseif ((!empty ($_FILES['attachment-file'])) && (my_upload() !== 'OK'))
+    {
 		$errorMsg = my_upload();
 		return $errorMsg;
-	} elseif (empty ($_FILES['attachment-file']['tmp_name'])) {
+	}
+	elseif (empty ($_FILES['attachment-file']['tmp_name']))
+    {
 		$errorMsg = 'Добавьте картинку';
 		return $errorMsg;
-	} else {
+	}
+	else
+	{
 
 		$link = my_connect() or die (mysqli_error($link));
 
@@ -566,23 +717,28 @@ function blog_edit() {
 		
 		$id = $_GET['edit'];
 		$date = date('Y-m-d H:i:s');
-		$query = "UPDATE blogs SET date='$date', description='$description', text='$text', author='$author' WHERE id=$id";
+		$query = "UPDATE blogs SET date='$date', description='$description', text='$text', author='$author' 
+                    WHERE id=$id";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 
-		if (!empty ($_FILES['attachment-file']['tmp_name'])) {
+		if (!empty ($_FILES['attachment-file']['tmp_name']))
+		{
 			$pathInfo = pathinfo($_FILES['attachment-file']['name']);
 		    $exp = $pathInfo['extension'];
 		    $blogimg = '../img/blogimg/' . $id . '_img.' . $exp;
 			move_uploaded_file($_FILES['attachment-file']['tmp_name'], $blogimg);
 			$query = "UPDATE blogs SET picture='$blogimg' WHERE id='$id'";
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
-		} else {
+		}
+		else
+		{
 			$query = "UPDATE blogs SET picture='../img/blogimg/stnd_blogimage.png' WHERE id='$id'";
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
 		$query = "DELETE FROM blog_cat WHERE blog_id=$id";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
-		foreach ($_POST['category'] as $category_id) {
+		foreach ($_POST['category'] as $category_id)
+		{
 			$query = "INSERT INTO blog_cat (blog_id, category_id) VALUES ('$id', '$category_id')";
 			$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		}
@@ -591,10 +747,13 @@ function blog_edit() {
 	header('Location: /admin/blogs.php');
 }
 
-function blog_edit_view() {
+function blog_edit_view ()
+{
 	$id = $_GET['edit'];
 	$link = my_connect() or die (mysqli_error($link));
-	$query = "SELECT blogs.id, blogs.description, blogs.text, categories.name as category_name FROM blogs INNER JOIN blog_cat ON blogs.id=blog_cat.blog_id INNER JOIN categories ON blog_cat.category_id=categories.id WHERE blogs.id=$id";
+	$query = "SELECT blogs.id, blogs.description, blogs.text, categories.name as category_name 
+                FROM blogs INNER JOIN blog_cat ON blogs.id=blog_cat.blog_id 
+                INNER JOIN categories ON blog_cat.category_id=categories.id WHERE blogs.id=$id";
 	$resultBlog = mysqli_query($link, $query) or die (mysqli_error($link));
 	$blog = mysqli_fetch_all($resultBlog, MYSQLI_ASSOC) or die (mysqli_error($link));
 
@@ -614,37 +773,48 @@ function blog_edit_view() {
     echo "<input class=\"regbtn\" type=\"submit\" name=\"blogedit\" value=\"Изменить\">";
 }
 
-function categories($id = null, $blog = null) {
+function categories($id = null, $blog = null)
+{
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM categories";
 	$resultCat = mysqli_query($link, $query) or die (mysqli_error($link));
 	$categories = mysqli_fetch_all($resultCat, MYSQLI_ASSOC) or die (mysqli_error($link));
 
-	if (isset ($id) && isset ($blog)) {
-		foreach ($blog as $catname) {
+	if (isset ($id) && isset ($blog))
+	{
+		foreach ($blog as $catname)
+		{
 			$arr[] = $catname['category_name'];
 		}
 
 		$value = 1;
-		foreach ($categories as $category) {
-			if (in_array($category['name'], $arr)) {
+		foreach ($categories as $category)
+		{
+			if (in_array($category['name'], $arr))
+			{
 				echo "<input type=\"checkbox\" id=\"category\" name=\"category[]\" value=\"" . $value . "\" multiple checked>" . $category['name'];
 				$value++;
-			} else {
+			}
+			else
+			{
 				echo "<input type=\"checkbox\" id=\"category\" name=\"category[]\" value=\"" . $value . "\" multiple>" . $category['name'];
 				$value++;	
 			}
 		}		
-	} else {
+	}
+	else
+	{
 		$value = 1;
-		foreach ($categories as $category) {
+		foreach ($categories as $category)
+		{
 		echo "<input type=\"checkbox\" id=\"category\" name=\"category[]\" value=\"" . $value . "\" multiple>" . $category['name'];
 		$value++;
 		}	
 	}
 }
 
-function blog_del() {
+function blog_del ()
+{
 	$id = $_GET['del'];
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT picture FROM blogs WHERE id=$id";
@@ -655,7 +825,8 @@ function blog_del() {
 	$resultBlogDel = mysqli_query($link, $query) or die (mysqli_error($link));
 	$query = "DELETE FROM blog_cat WHERE blog_id=$id";
 	$resultCatDel = mysqli_query($link, $query) or die (mysqli_error($link));
-	if ($imagePath != '../img/blogimg/stnd_blogimage.png') {
+	if ($imagePath != '../img/blogimg/stnd_blogimage.png')
+	{
 		unlink($imagePath);
 	}
 	$errorMsg = 'Блог удален';
@@ -663,7 +834,8 @@ function blog_del() {
 }
 
 // ADMIN HOME PAGE
-function statistics() {
+function statistics ()
+{
 	$link = my_connect() or die (mysqli_error($link));
 	$query1 = mysqli_query($link, "SELECT COUNT(*) FROM blogs");
 	$blogs = mysqli_fetch_row($query1)[0];
@@ -680,14 +852,20 @@ function statistics() {
 }
 
 // ADD REVIEWS
-function review_submit() {
-	if ($_SESSION['auth'] !== true) {
+function review_submit ()
+{
+	if ($_SESSION['auth'] !== true)
+	{
 		$errorMsg = 'Чтобы оставить отзыв необходимо авторизоваться!';
 		return $errorMsg;
-	} elseif (mb_strlen($_POST['review']) > 1000) {
+	}
+	elseif (mb_strlen($_POST['review']) > 1000)
+    {
 		$errorMsg = 'Отзыв не может быть длиннее 1000 символов!';
 		return $errorMsg;
-	} else {
+	}
+	else
+	{
 		$review = $_POST['review'];
 		$userID = $_SESSION['userid'];
 	
@@ -700,29 +878,35 @@ function review_submit() {
 	}
 }
 
-function reviews_view() {
+function reviews_view ()
+{
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM reviews";
 	$resultReviews = mysqli_query($link, $query) or die (mysqli_error($link));
 	
-	if (mysqli_num_rows($resultReviews) > 0) {
-
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+	if (mysqli_num_rows($resultReviews) > 0)
+	{
+		if(empty($_GET['page']) or $_GET['page'] <= 1)
+		{
 			$_GET['page'] = 1;
 			$page = $_GET['page'];
-		} else {
+		}
+		else
+		{
 			$page = $_GET['page'];
 		}
 	
 		$notesOnPage = 23;
 		$from = ($page - 1) * $notesOnPage;
-		
 
-		$query = "SELECT *, reviews.id as reviews_id FROM reviews INNER JOIN users ON reviews.user_id=users.id ORDER BY date DESC LIMIT $from, $notesOnPage";
+		$query = "SELECT *, reviews.id as reviews_id FROM reviews 
+                    INNER JOIN users ON reviews.user_id=users.id 
+                    ORDER BY date DESC LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 
 		$reviews = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
-		foreach ($reviews as $review) {
+		foreach ($reviews as $review)
+		{
 			echo "<tr>";
 			echo "<td>" . $review['reviews_id'] ."</td>";
             echo "<td>" . $review['username'] ."</td>";
@@ -734,7 +918,8 @@ function reviews_view() {
 	}
 }
 
-function review_del() {
+function review_del ()
+{
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "DELETE FROM reviews WHERE id={$_GET['delrev']}";
 	$resultReviewDel = mysqli_query($link, $query) or die (mysqli_error($link));
@@ -742,13 +927,17 @@ function review_del() {
 	return $errorMsg;
 }
 
-function review_read($id) {
+function review_read($id)
+{
 	$link = my_connect() or die (mysqli_error($link));
-	$query = "SELECT *, users.id as user_id FROM reviews INNER JOIN users ON reviews.user_id=users.id WHERE reviews.id=$id";
+	$query = "SELECT *, users.id as user_id FROM reviews 
+                INNER JOIN users ON reviews.user_id=users.id 
+                WHERE reviews.id=$id";
 	$resultReview = mysqli_query($link, $query) or die (mysqli_error($link));
 	$reviewRead = mysqli_fetch_all($resultReview, MYSQLI_ASSOC);
 
-	foreach ($reviewRead as $key => $value) {
+	foreach ($reviewRead as $key => $value)
+	{
 		echo "<p class=\"reviewRead\">Автор: <span class=\"reviewspan\">" . $value['username'] . "</span></p>";
 		echo "<p class=\"reviewRead\"> Дата добавления: <span class=\"reviewspan\">" . $value['date'] . "</span></p>";
 		echo "<textarea class=\"reviewarea\">" . $value['review'] . "</textarea>";
@@ -756,17 +945,22 @@ function review_read($id) {
 }
 
 // ADMIN USERS
-function users_view() {
+function users_view ()
+{
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM users";
 	$resultUsers = mysqli_query($link, $query) or die (mysqli_error($link));
 	
-	if (mysqli_num_rows($resultUsers) > 0) {
+	if (mysqli_num_rows($resultUsers) > 0)
+	{
 
-		if(empty($_GET['page']) or $_GET['page'] <= 1) {
+		if(empty($_GET['page']) or $_GET['page'] <= 1)
+		{
 			$_GET['page'] = 1;
 			$page = $_GET['page'];
-		} else {
+		}
+		else
+		{
 			$page = $_GET['page'];
 		}
 	
@@ -774,20 +968,25 @@ function users_view() {
 		$from = ($page - 1) * $notesOnPage;
 		
 
-		$query = "SELECT *, users.id as user_id FROM users INNER JOIN status ON status.id=users.status_id ORDER BY user_id LIMIT $from, $notesOnPage";
+		$query = "SELECT *, users.id as user_id FROM users 
+                    INNER JOIN status ON status.id=users.status_id 
+                    ORDER BY user_id LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
-
 		$users = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
 
-		foreach ($users as $user) {
+		foreach ($users as $user)
+		{
 			echo "<tr>";
 			echo "<td>" . $user['user_id'] . "</td>";
             echo "<td>" . $user['username'] . "</td>";
             echo "<td>" . $user['status'] . "</td>";
             echo "<td><a id =\"blogtable\" href=\"?del=" . $user['user_id'] . "\"</a>Удалить</td>";
-            if ($user['banned'] == 0) {
+            if ($user['banned'] == 0)
+            {
             	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Забанить</td>";
-            } elseif ($user['banned'] == 1) {
+            }
+            elseif ($user['banned'] == 1)
+            {
             	echo "<td><a id =\"blogtable\" href=\"?ban=" . $user['user_id'] . "\"</a>Разбанить</td>";
             }
             echo "<td><a id =\"blogtable\" href=\"userstatus.php?status=" . $user['user_id'] . "\"</a>Сменить статус</td>";
@@ -796,9 +995,11 @@ function users_view() {
 	}
 }
 
-function user_del() {
+function user_del ()
+{
 	$id = $_GET['del'];
-	if ($_SESSION['userid'] == $id) {
+	if ($_SESSION['userid'] == $id)
+	{
 		$errorMsg = 'Нельзя удалить текущего пользователя';
 		return $errorMsg;
 	}
@@ -809,7 +1010,8 @@ function user_del() {
 	$AvaPath = $result['avatar'];
 	$query = "DELETE FROM users WHERE id=$id";
 	$resultBlogDel = mysqli_query($link, $query) or die (mysqli_error($link));
-	if ($AvaPath != 'img/avatars/stnd_ava.png') {
+	if ($AvaPath != 'img/avatars/stnd_ava.png')
+	{
 		$path = '../' . $AvaPath;
 		unlink($path);
 	}
@@ -817,9 +1019,11 @@ function user_del() {
 	return $errorMsg;
 }
 
-function user_ban() {
+function user_ban ()
+{
 	$id = $_GET['ban'];
-	if ($_SESSION['userid'] == $id) {
+	if ($_SESSION['userid'] == $id)
+	{
 		$errorMsg = 'Нельзя забанить текущего пользователя';
 		return $errorMsg;
 	}
@@ -827,20 +1031,23 @@ function user_ban() {
 	$query = "SELECT * FROM users WHERE id=$id";
 	$resultUser = mysqli_query($link, $query) or die (mysqli_error($link));
 	$user = mysqli_fetch_all($resultUser, MYSQLI_ASSOC) or die (mysqli_error($link));
-	if ($user[0]["banned"] == 0) {
+	if ($user[0]["banned"] == 0)
+	{
 		$query = "UPDATE users SET banned=1 WHERE id=$id";
 		$resultUser = mysqli_query($link, $query) or die (mysqli_error($link));
 		header('Location: /admin/users.php');
-	} elseif ($user[0]["banned"] == 1) {
+	}
+	elseif ($user[0]["banned"] == 1)
+    {
 		$query = "UPDATE users SET banned=0 WHERE id=$id";
 		$resultUser = mysqli_query($link, $query) or die (mysqli_error($link));
-
 		header('Location: /admin/users.php');
 	}
 
 }
 
-function user_status() {
+function user_status ()
+{
 	$id = $_GET['status'];
 
 	$link = my_connect() or die (mysqli_error($link));
@@ -848,15 +1055,20 @@ function user_status() {
 	$resultStatus = mysqli_query($link, $query) or die (mysqli_error($link));
 	$status = mysqli_fetch_all($resultStatus, MYSQLI_ASSOC) or die (mysqli_error($link));
 
-	$query = "SELECT *, users.id as user_id FROM users INNER JOIN status ON status.id=users.status_id WHERE users.id=$id";
+	$query = "SELECT *, users.id as user_id FROM users 
+                INNER JOIN status ON status.id=users.status_id 
+                WHERE users.id=$id";
 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
 	$user = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
 
 	echo "<div class=\"categoryadddiv\">";
 		foreach ($status as $value) {
-			if ($user[0]['status'] == $value['status']) {
+			if ($user[0]['status'] == $value['status'])
+			{
 				echo "<input type=\"radio\" id=\"category\" name=\"statusname\" value=\"" . $value['id'] . "\"checked>" . $value['status'];
-			} else {
+			}
+			else
+			{
 				echo "<input type=\"radio\" id=\"category\" name=\"statusname\" value=\"" . $value['id'] . "\">" . $value['status'];
 				
 			}		
@@ -865,11 +1077,13 @@ function user_status() {
 	echo "<input class=\"regbtn\" type=\"submit\" name=\"statusupdate\" value=\"Изменить\">";
 }
 
-function user_status_update() {
+function user_status_update ()
+{
 	$id = $_GET['status'];
 	$statusId = $_POST['statusname'];
 
-	if ($_SESSION['userid'] == $id) {
+	if ($_SESSION['userid'] == $id)
+	{
 		$errorMsg = 'Нельзя менять статус текущего пользователя';
 		return $errorMsg;
 	}
@@ -881,7 +1095,8 @@ function user_status_update() {
 	header('Location: /admin/users.php');
 }
 
-function article_view($id) {
+function article_view ($id)
+{
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM blogs WHERE id=$id";
 	$resultArt = mysqli_query($link, $query) or die (mysqli_error($link));
@@ -893,8 +1108,10 @@ function article_view($id) {
 
 	echo "<p class='art'><span class='art_span'>Автор: </span>" . $article[0]['author'] . "</p>";
 	echo "<p class='art'><span class='art_span'>Дата создания: </span>" . $article[0]['date'] . "</p>";
-	foreach ($categories as $key => $value) {
-		foreach ($value as $key => $category) {
+	foreach ($categories as $key => $value)
+	{
+		foreach ($value as $key => $category)
+		{
 			$categ .= $category . '; ';
 		}
 	}
@@ -907,7 +1124,8 @@ function article_view($id) {
 	echo "<hr color='#EE0C44'><br>";
 }
 
-function comment_add() {
+function comment_add ()
+{
 	$comment = trim($_POST['comment']);
 	$blog_id = $_GET['id'];
 	$author = $_SESSION['username'];
@@ -921,46 +1139,61 @@ function comment_add() {
 	$resultCommentBlog = mysqli_query($link, $query) or die (mysqli_error($link));
 }
 
-function comments_view() {
+function comments_view ()
+{
 	$blog_id = $_GET['id'];
 
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "SELECT * FROM comments_blogs WHERE blog_id=$blog_id";
 	$resultComments = mysqli_query($link, $query) or die (mysqli_error($link));
 
-	if(empty($_GET['page']) or $_GET['page'] <= 1) {
+	if(empty($_GET['page']) or $_GET['page'] <= 1)
+	{
 		$_GET['page'] = 1;
 		$page = $_GET['page'];
-	} else {
+	}
+	else
+	{
 		$page = $_GET['page'];
 	}
 	$notesOnPage = 10;
 	$from = ($page - 1) * $notesOnPage;
 
-	if (mysqli_num_rows($resultComments) > 0) {
-		$query = "SELECT comments.id, comments.author, comments.date, comment, avatar FROM users RIGHT JOIN comments ON users.username=comments.author INNER JOIN comments_blogs ON comments.id=comments_blogs.comment_id INNER JOIN blogs ON comments_blogs.blog_id=blogs.id WHERE blogs.id=$blog_id ORDER BY date DESC LIMIT $from, $notesOnPage";
+	if (mysqli_num_rows($resultComments) > 0)
+	{
+		$query = "SELECT comments.id, comments.author, comments.date, comment, avatar 
+                    FROM users 
+                    RIGHT JOIN comments ON users.username=comments.author 
+                    INNER JOIN comments_blogs ON comments.id=comments_blogs.comment_id 
+                    INNER JOIN blogs ON comments_blogs.blog_id=blogs.id 
+                    WHERE blogs.id=$blog_id 
+                    ORDER BY date DESC LIMIT $from, $notesOnPage";
 		$result = mysqli_query($link, $query) or die (mysqli_error($link));
 		$comment = mysqli_fetch_all($result, MYSQLI_ASSOC) or die (mysqli_error($link));
-		foreach ($comment as $key => $value) {
+		foreach ($comment as $key => $value)
+		{
 				echo "<div class=\"comment\">";
 				echo "<div class=\"imgauthor\">";
 				echo "<img class=\"commentimg\" src=\"" . $value['avatar'] . "\">";
 				echo "<span class=\"commentauthor\">" . $value['author'] . "</span><br>";
 				echo "<span class=\"commentauthor\">" . $value['date'] . "</span><br>";
-				if ($_SESSION['status'] == 3) {
+				if ($_SESSION['status'] == 3)
+				{
 					echo "<a href=\"admin/commentdel.php?comdel=" . $value['id'] . "\" name=\"commentdel\" id=\"commentdel\">Удалить</a>";
 				}
 				echo "</div>";
 				echo "<div class=\"commentspan\"><pre>" . $value['comment'] . "</pre></div>";
 				echo "</div>";
 		}
-		if (mysqli_num_rows($resultComments) > 10) {
+		if (mysqli_num_rows($resultComments) > 10)
+		{
 			blog_buttons_admin();
 		}
 	}
 }
 
-function comment_del($id) {
+function comment_del($id)
+{
 	$link = my_connect() or die (mysqli_error($link));
 	$query = "DELETE FROM comments WHERE id=$id";
 	$result = mysqli_query($link, $query) or die (mysqli_error($link));
